@@ -1,5 +1,5 @@
 /* LA-Checker by Isaac Jung
-Last updated 02/04/2022
+Last updated 02/09/2022
 
 |===========================================================================================================|
 | == Usage ==                                                                                               |
@@ -60,6 +60,7 @@ Last updated 02/04/2022
 */
 
 #include "InputInfo.h"
+#include "Array.h"
 
 // method forward declarations
 int conclusion(bool isLA);
@@ -79,8 +80,14 @@ int main(int argc, char *argv[])
 	int status = in.process_input();
     if (status == -1) exit(1);
     if (status == 1) return conclusion(false);
+    Array array(&in);
+
     // TODO: CHECK THAT ALL LEVELS AND 2 WAY INTERACTIONS ARE COVERED
+    if (!array.has_strength_2()) return conclusion(false);
+
     // TODO: CHECK THAT THERE ARE NO CONFLICTS THAT CANNOT BE RESOLVED
+    if (!array.has_locating_property()) return conclusion(false);
+
     return conclusion(true);
 }
 
