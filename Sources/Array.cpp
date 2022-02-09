@@ -2,13 +2,18 @@
 Last updated 02/09/2022
 
 |===========================================================================================================|
-|   TO BE WRITTEN                                                                                           |
+|   This file containes the meat of this project's logic. The constructor for the Array class has a pointer |
+| to an InputInfo object which should have already called its process_info() method. Using that, the Array  |
+| object under construction is able to organize the data structures that support the analysis of the given  |
+| locating array. The has_strength_2() and has_locating_property() methods can then be called right away.   |
 |===========================================================================================================| 
 */
 
 #include "Array.h"
 #include <iostream>
 
+/* CONSTRUCTOR - initializes the object
+*/
 Array::Array(InputInfo *in)
 {
     num_tests = in->num_rows;
@@ -32,8 +37,6 @@ Array::Array(InputInfo *in)
                     pair[this_level*other_level+other_level].other_val = other_level;
                     for (int row = 0; row < in->num_rows; row++) {   // go find rows where this interaction occurs
                         if (in->array.at(row)[i] == this_level && in->array.at(row)[j] == other_level) {
-                            //printf("DEBUG: FOUND INTERACTION (%d, %d) for factors (%d, %d) at row %d.\n",
-                            //    this_level, other_level, i, j, row);
                             pair[this_level*other_level+other_level].rows.insert(row);
                         }
                     }
@@ -49,11 +52,18 @@ Array::Array(InputInfo *in)
     factors[num_factors-1].interactions = nullptr;//*/
 }
 
+/* SUB METHOD: has_strength_2 - performs the analysis for coverage
+ * 
+ * parameters:
+ * - none
+ * 
+ * returns:
+ * - true if the array has strength 2, false if not
+*/
 bool Array::has_strength_2()
 {
     printf("CHECKING COVERAGE....\n\n");
     bool passed = true;
-    //
     int idx;
     for (int i = 0; i < num_factors - 1; i++) { // for every factor (column) but the last
         idx = 0;
@@ -70,11 +80,19 @@ bool Array::has_strength_2()
             }
             idx++;
         }
-    }//*/
+    }
     printf("COVERAGE CHECK: %s\n\n", passed ? "PASSED" : "FAILED");
     return passed;
 }
 
+/* SUB METHOD: has_locating_property - performs the analysis for the locating property
+ * 
+ * parameters:
+ * - none
+ * 
+ * returns:
+ * - true if the array has the locating property, false if not
+*/
 bool Array::has_locating_property()
 {
     return true;
@@ -90,6 +108,8 @@ bool Array::has_locating_property()
     */
 }
 
+/* DECONSTRUCTOR - frees memory
+*/
 Array::~Array()
 {
     delete[] factors;

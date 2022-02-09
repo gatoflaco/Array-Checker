@@ -2,7 +2,8 @@
 Last updated 02/09/2022
 
 |===========================================================================================================|
-|   TO BE WRITTEN                                                                                           |
+|   This header contains a class for managing the array in a more oganized fashion. There are some methods  |
+| the user of this class can call to automate the analysis of the array.                                    |
 |===========================================================================================================| 
 */
 

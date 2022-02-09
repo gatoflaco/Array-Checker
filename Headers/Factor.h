@@ -2,7 +2,8 @@
 Last updated 02/09/2022
 
 |===========================================================================================================|
-|   TO BE WRITTEN                                                                                           |
+|   This header contains classes used for organizing data associated with the arrays used by check.cpp. See |
+| InputInfo.cpp for a look at how these classes are used.                                                   |
 |===========================================================================================================| 
 */
 
