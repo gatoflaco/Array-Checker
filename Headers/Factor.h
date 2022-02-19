@@ -30,10 +30,12 @@ class Factor
 class Interaction
 {
     public:
-        Factor *other;
+        Factor *this_factor;
+        Factor *other_factor;
         int this_val;
         int other_val;
-        std::set<int> rows;
+        std::set<int> occurrences;
+        bool is_locating;
 };
 
 #endif // FACTOR

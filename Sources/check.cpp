@@ -82,7 +82,6 @@ int main(int argc, char *argv[])
     if (status == 1) return conclusion(false);
     Array array(&in);
 
-    // TODO: CHECK THAT ALL LEVELS AND 2 WAY INTERACTIONS ARE COVERED
     if (!array.has_strength_2()) return conclusion(false);
 
     // TODO: CHECK THAT THERE ARE NO CONFLICTS THAT CANNOT BE RESOLVED
