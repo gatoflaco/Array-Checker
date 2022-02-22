@@ -1,5 +1,5 @@
 /* LA-Checker by Isaac Jung
-Last updated 02/19/2022
+Last updated 02/22/2022
 
 |===========================================================================================================|
 |   This file containes the meat of this project's logic. The constructor for the Array class has a pointer |
@@ -19,8 +19,8 @@ Last updated 02/19/2022
 
 // method forward declarations
 static void print_failure(int f1, int v1, int f2, int v2);
-static void print_failure(int i1f1, int i1v1, int i1f2, int i1v2, std::set<int> *i1r,
-    int i2f1, int i2v1, int i2f2, int i2v2, std::set<int> *i2r);
+static void print_failure(int i1f1, int i1v1, int i1f2, int i1v2, std::set<int> *rows,
+    int i2f1, int i2v1, int i2f2, int i2v2);
 
 /* CONSTRUCTOR - initializes the object
 */
@@ -80,7 +80,7 @@ Array::Array(InputInfo *in)
 */
 bool Array::has_strength_2()
 {
-    printf("CHECKING COVERAGE....\n\n");
+    printf("Checking coverage....\n\n");
     bool passed = true;
     int idx;
     for (int i = 0; i < num_factors - 1; i++) { // for every factor (column) but the last
@@ -111,7 +111,7 @@ bool Array::has_strength_2()
 */
 bool Array::has_locating_property()
 {
-    printf("CHECKING LOCATING PROPERTY....\n\n");
+    printf("Checking locating property....\n\n");
     bool passed = true;
     int num_interactions = num_factors*(num_factors-1)/2;
     std::set<int> *occurrences1, *occurrences2;
@@ -123,21 +123,18 @@ bool Array::has_locating_property()
                 occurrences2 = &test.interactions.at(i2)->occurrences;    // the set of all rows in which interaction 2 occurs
 
                 // see if i1's rows are a subset of i2's; if so, i1 is wiped out by i2 and cannot be located
-                if (std::includes(occurrences2->begin(), occurrences2->end(), occurrences1->begin(), occurrences1->end())) {
+                if (*occurrences1 == *occurrences2) {
                     if (!test.interactions.at(i1)->is_locating) continue;   // may want to comment this line
-                    print_failure(
-                        test.interactions.at(i1)->this_factor->id, test.interactions.at(i1)->this_val,
-                        test.interactions.at(i1)->other_factor->id, test.interactions.at(i1)->other_val,
-                        occurrences1,
+                    print_failure( test.interactions.at(i1)->this_factor->id, test.interactions.at(i1)->this_val,
+                        test.interactions.at(i1)->other_factor->id, test.interactions.at(i1)->other_val, occurrences1,
                         test.interactions.at(i2)->this_factor->id, test.interactions.at(i2)->this_val,
-                        test.interactions.at(i2)->other_factor->id, test.interactions.at(i2)->other_val,
-                        occurrences2);
+                        test.interactions.at(i2)->other_factor->id, test.interactions.at(i2)->other_val);
                     test.interactions.at(i1)->is_locating = false;
                     passed = false;
                 }
 
                 // see if i2's rows are a subset of i1's (they could even be subsets of each other; equal)
-                if (std::includes(occurrences1->begin(), occurrences1->end(), occurrences2->begin(), occurrences2->end())) {
+                /*if (std::includes(occurrences1->begin(), occurrences1->end(), occurrences2->begin(), occurrences2->end())) {
                     if (!test.interactions.at(i2)->is_locating) continue;
                     print_failure(
                         test.interactions.at(i2)->this_factor->id, test.interactions.at(i2)->this_val,
@@ -148,10 +145,10 @@ bool Array::has_locating_property()
                         occurrences1);
                     test.interactions.at(i2)->is_locating = false;
                     passed = false;
-                }
+                }//*/
             }
         }
-    }//*/
+    }
     printf("LOCATING CHECK: %s\n\n", passed ? "PASSED" : "FAILED");
     return passed;
 }
@@ -170,25 +167,17 @@ Array::~Array()
 static void print_failure(int f1, int v1, int f2, int v2)
 {
     printf("\t-- INTERACTION NOT FOUND --\n");
-    printf("\t(%d, %d) and (%d, %d)\n\n", f1, v1, f2, v2);
+    printf("\t(f%d, %d) and (f%d, %d)\n\n", f1, v1, f2, v2);
 }
 
-static void print_failure(int i1f1, int i1v1, int i1f2, int i1v2, std::set<int> *i1o,
-    int i2f1, int i2v1, int i2f2, int i2v2, std::set<int> *i2o)
+static void print_failure(int i1f1, int i1v1, int i1f2, int i1v2, std::set<int> *rows,
+    int i2f1, int i2v1, int i2f2, int i2v2)
 {
-    std::string str;
-
-    printf("\t-- INTERACTION NOT LOCATING --\n");
-    printf("\t(%d, %d) and (%d, %d)\n", i1f1, i1v1, i1f2, i1v2);
+    printf("\t-- INTERACTIONS NOT LOCATING --\n");
+    printf("\tInteraction 1: (f%d, %d) and (f%d, %d)\n", i1f1, i1v1, i1f2, i1v2);
+    printf("\tInteraction 2: (f%d, %d) and (f%d, %d)\n", i2f1, i2v1, i2f2, i2v2);
     printf("\trows: { ");
-    str = "";
-    for (int row : *i1o) str += std::to_string(row + 1) + ", ";
-    printf("%s }\n", str.substr(0, str.size() - 2).c_str());
-
-    printf("\t-> These occurrences form a subset of:\n");
-    printf("\t   (%d, %d) and (%d, %d)\n", i2f1, i2v1, i2f2, i2v2);
-    printf("\t   rows: { ");
-    str = "";
-    for (int row : *i2o) str += std::to_string(row + 1) + ", ";
+    std::string str = "";
+    for (int row : *rows) str += std::to_string(row + 1) + ", ";
     printf("%s }\n\n", str.substr(0, str.size() - 2).c_str());
 }

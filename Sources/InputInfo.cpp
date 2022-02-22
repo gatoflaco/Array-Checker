@@ -1,5 +1,5 @@
 /* LA-Checker by Isaac Jung
-Last updated 02/07/2022
+Last updated 02/22/2022
 
 |===========================================================================================================|
 |   This file contains definitions for methods used to process input via an InputInfo class. Should the     |
@@ -22,7 +22,7 @@ Last updated 02/07/2022
 */
 int InputInfo::process_input()
 {
-    printf("READING INPUT....\n\n");
+    printf("Reading input....\n\n");
     int ret = 0;
     std::string cur_line;
 
