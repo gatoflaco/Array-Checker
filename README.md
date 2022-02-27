@@ -1,5 +1,5 @@
-### LA-Checker
-# Author: Isaac Jung
+# LA-Checker
+### Author: Isaac Jung
 
 ## Credits
 [Stephen A. Seidel](https://www.linkedin.com/in/stephen-seidel-18607069/)
@@ -23,13 +23,13 @@ Example (including input redirection, **which is recommended**):
 ./check 1 2 -hl < Sample-Input/Colbourn1.tsv
 ```
 - This would run the program with d = 1, t = 2, in "halfway" output mode, looking for only the locating property, using the file `Sample-Input/Colbourn.tsv` as a source of input. Read on for full details.
-# Compiling
+### Compiling
 Included is a simple makefile for quick compilation of the exectuable. After downloading the project, the makefile can be used in a terminal by running the following command from within its directory:
 ```
 make
 ```
 This will create the executable with the name "check" in the same directory as the makefile, unless the executable already exists and is up to date. Of course, the makefile can be edited, or compilation can be done manually, for a different executable.
-# Running
+### Running
 After compiling, the executable may be started at will. For example, from within the same directory, the following command will run the program once:
 ```
 ./check
@@ -39,7 +39,7 @@ Running the program like this, it will appear to get stuck waiting for input for
 ./check < Sample-Input/example.tsv
 ```
 This would automatically read lines from `Sample-Input/example.tsv` with no extra input required. Replace the path with that of the file to be analyzed. Note that if no [additional arguments](#options) are given, the program has certain default behaviors, including default d, t values (read about this in the [options](#command-line-arguments) section further below.
-# Input
+### Input
 The format of the input should be as follows:
 ```
 v2.0
@@ -60,7 +60,7 @@ L_1 L_2 ... L_F
 - Starting at the fourth line, there must be (C+1) lines consisting of just the number 0.
 - After that, there begins the LA. It should hold that the LA has as many rows as was specified by R and as many columns as was specified by C. Furthermore, every column should consist of values that are within the corresponding number of levels given on the third line. All values in a given row of the LA should be separated by whitespace, and all rows should be on their own lines.
 Violating the format will result in some sort of error, meaning the program will not attempt to analyze anything. The program is capable of some very basic error identification, to assist you in fixing small issues in your input. Typically the file format is a TSV (tab separated values), meaning that any whitespace characters are actually tabs. However, it is fine to use standard whitespace as well, meaning a TSV is not mandatory. Check the `Sample-Input/` directory for examples of the file format in action. Also note that any additional lines after the array will not be looked at, meaning you can use that space to add notes or other useful info without disrupting the program.
-# Output
+### Output
 By default, when there are no input format errors, the output of this program shows high level checks performed on the array. Specifically, it will look like this:
 ```
 Reading input....
@@ -122,7 +122,7 @@ The program may be invoked with a number of additional command line arguments an
 - The command line arguments should *not* have leading hyphens and are simply delimited by whitespace. The relative order of these arguments **actually matters**. While flags can be mixed in anywhere between the arguments, the arguments are interpretted like this: the first integer encountered is assumed to be t. If a second integer is encountered, it is assumed to be d. If a third is encountered, it is assumed to be δ. This means that in order to specify d, you must also specify t, and in order to specify δ, you must also specify both d and t.
 - The flags are demarcated by a leading hyphen. Flags may use separate hyphens or share a single one. To "share" a single hyphen, additional flags beyond the first must succeed each other directly, i.e., without any whitespace. If whitespace is used between flags, a hyphen must be prepended for each whitespace-separated group of flags.
 - If the program cannot interpret a command line argument, it will ignore it and continue, possibly using default values/behaviors.
-# Command Line Arguments
+### Command Line Arguments
 d: an integer bounded between 1 and t, inclusive
 - Represents the magnitude of sets of interactions used; these sets are used in comparisons necessary to analyzing the locating and detecting properties of arrays.
 - If not given, 1 is used by default.
@@ -133,7 +133,7 @@ t: an integer bounded between 1 and the number of factors, inclusive
 - Represents [separation](#details-and-definitions), a strictness on the detection check; the higher the value of δ, the more strict the check. Realistically, the upper bound is much lower than the total number of tests.
 - If not given, 1 is used by default.
 - Goes unused if the c or l flags are given but not the d flag.
-# Flags
+### Flags
 v: verbose
 - More output: simply states what values of d and t are in use, as well as the output mode, prior to reading input.
 - Rest of output format unchanged.
