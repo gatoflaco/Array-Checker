@@ -4,9 +4,11 @@
 ## Credits
 [Stephen A. Seidel](https://www.linkedin.com/in/stephen-seidel-18607069/)
 - Author of the [v4-la-tools project](#additional-links) which this project aims to supplement
+
 [Violet R. Syrotiuk, Ph.D.](https://isearch.asu.edu/profile/518662)
 - Supervisor of this project
 - Author of research on locating arrays
+
 [Charles J. Colbourn, Ph.D.](https://isearch.asu.edu/profile/384970)
 - Advisor to the author of this project
 - Credited for [proposing locating and detecting arrays](#additional-links)
@@ -38,7 +40,7 @@ Running the program like this, it will appear to get stuck waiting for input for
 ```
 ./check < Sample-Input/example.tsv
 ```
-This would automatically read lines from `Sample-Input/example.tsv` with no extra input required. Replace the path with that of the file to be analyzed. Note that if no [additional arguments](#options) are given, the program has certain default behaviors, including default d, t values (read about this in the [options](#command-line-arguments) section further below.
+This would automatically read lines from `Sample-Input/example.tsv` with no extra input required. Replace the path with that of the file to be analyzed. Note that if no [additional arguments](#options) are given, the program has certain default behaviors, including default d, t values (read about this in the [options](#command-line-arguments) section further below).
 ### Input
 The format of the input should be as follows:
 ```
@@ -126,9 +128,11 @@ The program may be invoked with a number of additional command line arguments an
 d: an integer bounded between 1 and t, inclusive
 - Represents the magnitude of sets of interactions used; these sets are used in comparisons necessary to analyzing the locating and detecting properties of arrays.
 - If not given, 1 is used by default.
+
 t: an integer bounded between 1 and the number of factors, inclusive
 - Represents how many (factor, value) tuples are included in an interaction; 1-way interactions by definition are just single (factor, value) tuples.
 - If not given, 2 is used by default.
+
 δ: an integer bounded between 1 and the number of tests, inclusive
 - Represents [separation](#details-and-definitions), a strictness on the detection check; the higher the value of δ, the more strict the check. Realistically, the upper bound is much lower than the total number of tests.
 - If not given, 1 is used by default.
@@ -137,18 +141,23 @@ t: an integer bounded between 1 and the number of factors, inclusive
 v: verbose
 - More output: simply states what values of d and t are in use, as well as the output mode, prior to reading input.
 - Rest of output format unchanged.
+
 h: halfway
 - Does not print any `coverage_issue`, `location_issue`, or `detection_issue`, but still signals what checks it is doing.
 - Mutually exclusive with the s flag; if both are specified, the last one seen takes priority.
+
 s: silent
 - Prints only the conclusion, and without the `CONCLUSION` header.
 - Mutually exclusive with the h flag; if both are specified, the last one seen takes priority.
+
 c: coverage
 - Coverage is computed and reported.
 - Can be combined with the l and d flags to report more than one thing. Not specifying any is the same as specifying all three.
+
 l: location
 - Location is computed and reported. This necessarily means coverage is computed internally, but the checking won't be shown unless the c flag is also set.
 - Can be combined with the l and d flags to report more than one thing. Not specifying any is the same as specifying all three.
+
 d: detection
 - Detection is computed and reported. This necessarily means coverage and location are computed internally, but the checking won't be shown unless the c and l flags are set, respectively.
 - Can be combined with the l and d flags to report more than one thing. Not specifying any is the same as specifying all three.
