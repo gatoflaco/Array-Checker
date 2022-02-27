@@ -14,7 +14,7 @@
 - Credited for [proposing locating and detecting arrays](#additional-links)
 
 ## Overview
-The purpose of this program is to verify whether test suites of enumerated 2-dimensional arrays have the covering, locating, and detecting properties. For those arrays which are detecting, the program can also give the highest separation. [Details and definitions](#details-and-definitions) are given further on. The inspiration of this project was [Stephen Seidel](#credits)'s [v4-la-tools](#additional-links), intended as a supplementary tool to verify the correctness of output produced by Stephen's program.
+The purpose of this program is to verify whether test suites of enumerated 2-dimensional arrays have the covering, locating, and detecting properties. For those arrays which are detecting, the program can also give the highest separation. [Details and definitions](#details-and-definitions) are given further on. The inspiration of this project was [Stephen Seidel's](#credits) [v4-la-tools](#additional-links), intended as a supplementary tool to verify the correctness of output produced by Stephen's program.
 
 ## Usage
 ```
@@ -179,6 +179,7 @@ Below is a non-comprehensive list of fundamental key words and concepts, ordered
 [Stephen Seidel's v4-la-tools](https://github.com/gatoflaco/v4-la-tools)
 - Project which inspired this one
 - Capable of generating (1, 2)-locating arrays from scratch, given factors and their levels
+
 Colbourn and McClary, *[Locating and Detecting Arrays for Interaction Faults](https://drops.dagstuhl.de/opus/volltexte/2009/2240/pdf/09281.ColbournCharles.Paper.2240.pdf)*
 - Paper cited as first to propose locating and detecting arrays
 - Formal definitions for covering, locating, and detecting arrays can be found here
