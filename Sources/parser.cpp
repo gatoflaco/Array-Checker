@@ -1,13 +1,13 @@
 /* LA-Checker by Isaac Jung
-Last updated 02/22/2022
+Last updated 02/25/2022
 
 |===========================================================================================================|
-|   This file contains definitions for methods used to process input via an InputInfo class. Should the     |
-| input format change, these methods can be updated accordingly.                                            |
+|   This file contains definitions for methods used to process input via an Parser class. Should the input  |
+| format change, these methods can be updated accordingly.                                                  |
 |===========================================================================================================| 
 */
 
-#include "InputInfo.h"
+#include "parser.h"
 #include <sstream>
 #include <iostream>
 #include <algorithm>
@@ -20,7 +20,7 @@ Last updated 02/22/2022
  * returns:
  * - code representing success/failure
 */
-int InputInfo::process_input()
+int Parser::process_input()
 {
     printf("Reading input....\n\n");
     int ret = 0;
@@ -115,7 +115,7 @@ int InputInfo::process_input()
  * credit:
  * - this function was adapted from Evan Teran's post at https://stackoverflow.com/a/217605
 */
-void InputInfo::trim(std::string &s) {
+void Parser::trim(std::string &s) {
     s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
         return !std::isspace(ch);
     }));
@@ -136,7 +136,7 @@ void InputInfo::trim(std::string &s) {
  * returns:
  * - void (caller should decide whether to quit or continue)
 */
-void InputInfo::syntax_error(int lineno, std::string expected, std::string actual, bool verbose)
+void Parser::syntax_error(int lineno, std::string expected, std::string actual, bool verbose)
 {
     printf("\t-- ERROR --\n\tInput format violated on line %d. Expected \"%s\" but got \"%s\" instead.\n",
         lineno, expected.c_str(), actual.c_str());
@@ -157,7 +157,7 @@ void InputInfo::syntax_error(int lineno, std::string expected, std::string actua
  * returns:
  * - void (caller should decide whether to quit or continue)
 */
-void InputInfo::semantic_error(int lineno, int row, int col, int level, int value, bool verbose)
+void Parser::semantic_error(int lineno, int row, int col, int level, int value, bool verbose)
 {
     printf("\t-- ERROR --\n\tArray format violated at row %d, column %d, on line %d.\n", row, col, lineno);
     if (value < 0)
@@ -179,7 +179,7 @@ void InputInfo::semantic_error(int lineno, int row, int col, int level, int valu
  * returns:
  * - void (caller should decide whether to quit or continue)
 */
-void InputInfo::other_error(int lineno, std::string line, bool verbose)
+void Parser::other_error(int lineno, std::string line, bool verbose)
 {
     printf("\t-- ERROR --\n\tError with line %d: \"%s\".\n", lineno, line.c_str());
     if (verbose) printf("\tFor formatting details, please check the README.\n");
@@ -188,7 +188,7 @@ void InputInfo::other_error(int lineno, std::string line, bool verbose)
 
 /* DECONSTRUCTOR - frees memory
 */
-InputInfo::~InputInfo()
+Parser::~Parser()
 {
     for (int *row : array) delete[] row;
 }

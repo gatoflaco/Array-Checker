@@ -4,17 +4,17 @@ SRC = Sources
 
 ALL all: check
 
-check: $(OBJ)/check.o $(OBJ)/InputInfo.o $(OBJ)/Array.o $(OBJ)/Factor.o
-	g++ -std=c++11 -o check $(OBJ)/check.o $(OBJ)/InputInfo.o $(OBJ)/Array.o $(OBJ)/Factor.o
+check: $(OBJ)/check.o $(OBJ)/parser.o $(OBJ)/array.o $(OBJ)/factor.o
+	g++ -std=c++11 -o check $(OBJ)/check.o $(OBJ)/parser.o $(OBJ)/array.o $(OBJ)/factor.o
 
 $(OBJ)/check.o: $(SRC)/check.cpp
 	g++ -I ./$(HDR) -c -o $(OBJ)/check.o $(SRC)/check.cpp
 
-$(OBJ)/InputInfo.o: $(HDR)/InputInfo.h $(SRC)/InputInfo.cpp
-	g++ -I ./$(HDR) -c -o $(OBJ)/InputInfo.o $(SRC)/InputInfo.cpp
+$(OBJ)/parser.o: $(HDR)/parser.h $(SRC)/parser.cpp
+	g++ -I ./$(HDR) -c -o $(OBJ)/parser.o $(SRC)/parser.cpp
 
-$(OBJ)/Array.o: $(HDR)/Array.h $(SRC)/Array.cpp
-	g++ -I ./$(HDR) -c -o $(OBJ)/Array.o $(SRC)/Array.cpp
+$(OBJ)/array.o: $(HDR)/array.h $(SRC)/array.cpp
+	g++ -I ./$(HDR) -c -o $(OBJ)/array.o $(SRC)/array.cpp
 
-$(OBJ)/Factor.o: $(HDR)/Factor.h $(SRC)/Factor.cpp
-	g++ -I ./$(HDR) -c -o $(OBJ)/Factor.o $(SRC)/Factor.cpp
+$(OBJ)/factor.o: $(HDR)/factor.h $(SRC)/factor.cpp
+	g++ -I ./$(HDR) -c -o $(OBJ)/factor.o $(SRC)/factor.cpp
