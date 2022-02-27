@@ -46,7 +46,7 @@ The format of the input should be as follows:
 ```
 v2.0
 R C
-L_1 L_2 ... L_F
+L_1 L_2 ... L_C
 0
 0
 ...
@@ -57,10 +57,10 @@ L_1 L_2 ... L_F
 # # # # # # # #
 ```
 - The first line MUST consist of the string "v2.0".
-- On the second line, give the number of rows in the LA, R, followed by the number of columns in the LA, C, separated by whitespace.
-- On the third line, give the number of levels that each factor can take on, respectively, each separated by whitespace.
-- Starting at the fourth line, there must be (C+1) lines consisting of just the number 0.
-- After that, there begins the LA. It should hold that the LA has as many rows as was specified by R and as many columns as was specified by C. Furthermore, every column should consist of values that are within the corresponding number of levels given on the third line. All values in a given row of the LA should be separated by whitespace, and all rows should be on their own lines.
+- On the second line, give the number of rows in the array, R, followed by the number of columns in the array, C, separated by whitespace.
+- On the third line, give the number of levels that each factor can take on, respectively, each separated by whitespace. The number of values given here should be equal to the value of C given on the first line.
+- Starting at the fourth line, there must be (C + 1) lines consisting of just the number 0. If you are wondering why... I'm not sure myself. This program's primary purpose is to validate output from Stephen's program, and his output does this for some reason.
+- After that, there begins the array. It should hold that the array has as many rows as was specified by R and as many columns as was specified by C. Furthermore, every column should consist of values that are within the corresponding number of levels given on the third line. All values in a given row of the array should be separated by whitespace, and all rows should be on their own lines.
 Violating the format will result in some sort of error, meaning the program will not attempt to analyze anything. The program is capable of some very basic error identification, to assist you in fixing small issues in your input. Typically the file format is a TSV (tab separated values), meaning that any whitespace characters are actually tabs. However, it is fine to use standard whitespace as well, meaning a TSV is not mandatory. Check the `Sample-Input/` directory for examples of the file format in action. Also note that any additional lines after the array will not be looked at, meaning you can use that space to add notes or other useful info without disrupting the program.
 ### Output
 By default, when there are no input format errors, the output of this program shows high level checks performed on the array. Specifically, it will look like this:
