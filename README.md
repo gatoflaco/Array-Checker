@@ -15,6 +15,10 @@
 - Advisor to the author of this project
 - Credited for [proposing locating and detecting arrays](#additional-links)
 
+[Michael Poirier-Shelton](https://github.com/MichaelPS1995)
+- Tester
+- Peer who worked with author on the problem
+
 ## Overview
 The purpose of this program is to verify whether test suites of enumerated 2-dimensional arrays have the covering, locating, and detecting properties. For those arrays which are detecting, the program can also give the highest separation. [Details and definitions](#details-and-definitions) are given further on. The inspiration of this project was [Stephen Seidel's](#credits) [v4-la-tools](#additional-links), intended as a supplementary tool to verify the correctness of output produced by Stephen's program.
 
