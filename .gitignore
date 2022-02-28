@@ -1,2 +1,5 @@
 check
 .vscode
+Objects/array.o
+Objects/factor.o
+Objects/parser.o
