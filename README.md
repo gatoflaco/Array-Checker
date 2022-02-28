@@ -1,3 +1,5 @@
+# EDIT 02/27/2022: REFACTORING IN PROGRESS, CODE WILL NOT COMPILE AT THE MOMENT
+
 # Array-Checker
 ### Author: Isaac Jung
 
