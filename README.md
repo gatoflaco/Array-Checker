@@ -1,4 +1,4 @@
-# LA-Checker
+# Array-Checker
 ### Author: Isaac Jung
 
 ## Credits
