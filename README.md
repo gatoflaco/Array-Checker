@@ -101,13 +101,13 @@ CONCLUSIONS:
 - The value of δ may or may not even be reported, as it only applies when the array is detecting. Note that this value of δ seen in the `CONCLUSION` section is the true separation, which may be higher than [the δ specified in the command line arguments](#command-line-arguments).
 - The output may be made more or less verbose than this using various [flags](#flags) on the command line. 
 - The `x_issue` lines are just indented lists of anything that violates property `x`. Their exact format depends on `x`. Below, an explanation of each is given alongside an example.
-  1. `coverage_issue`:
+1. `coverage_issue`:
 ```
 -- 3-WAY INTERACTION NOT PRESENT --
 {(f0, 2), (f2, 3), (f3, 0)}
 ```
   - This says that the 3-way interaction between factor 0 with value 2, factor 2 with value 3, and factor 3 with value 0, is not present on any row of the array. Note that different values of d do not affect this output; only t does. This example would be for a user-specified t = 3.
-  2. `location_issue`:
+2. `location_issue`:
 ```
 -- DISTINCT SETS WITH EQUAL ROWS --
 Set 1: { {(f0, 1), (f3, 0)}; {(f0, 1), (f3, 1)} }
@@ -115,7 +115,7 @@ Set 2: { {(f1, 1), (f3, 0)}; {(f1, 1), (f3, 1)} }
 rows: { 9, 10 }
 ```
   - This shows two sets of user-specified magnitude d = 2, each consisting of two 2-way interactions. The interpretation of this output is that the rows in which the first set of interactions occurs is equal to the rows in which the second set of interaction occurs, specifically rows 9 and 10. For more information on why this is an issue, refer to the [details and definitions](#details-and-definitions) section.
-  3. `detection_issue`:
+3. `detection_issue`:
 ```
 -- ROW DIFFERENCE LESS THAN 2 --
 Interaction: {(f0, 0), (f3, 2)}, { 2, 4 }
