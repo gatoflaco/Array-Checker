@@ -126,7 +126,7 @@ Difference: { 2 }
 
 ## Options
 The program may be invoked with a number of additional command line arguments and flags to alter its behavior. This is different from I/O redirection. Refer to the [usage](#usage) section for a better visual of what it looks like. This section describes the details:
-- Despite the simplified visual in the usage section, [Command line arguments](#command-line-arguments) and [flags](#flags) may actually come in either order. They are distingushed by a hyphen character (-).
+- Despite the simplified visual in the usage section, [command line arguments](#command-line-arguments) and [flags](#flags) may actually come in either order. They are distingushed by a hyphen character (-).
 - The command line arguments should *not* have leading hyphens and are simply delimited by whitespace. The relative order of these arguments **actually matters**. While flags can be mixed in anywhere between the arguments, the arguments are interpretted like this: the first integer encountered is assumed to be t. If a second integer is encountered, it is assumed to be d. If a third is encountered, it is assumed to be δ. This means that in order to specify d, you must also specify t, and in order to specify δ, you must also specify both d and t.
 - The flags are demarcated by a leading hyphen. Flags may use separate hyphens or share a single one. To "share" a single hyphen, additional flags beyond the first must succeed each other directly, i.e., without any whitespace. If whitespace is used between flags, a hyphen must be prepended for each whitespace-separated group of flags.
 - If the program cannot interpret a command line argument, it will ignore it and continue, possibly using default values/behaviors.
