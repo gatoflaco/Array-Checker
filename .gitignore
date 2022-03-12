@@ -3,3 +3,4 @@ check
 Objects/array.o
 Objects/factor.o
 Objects/parser.o
+ignore/*

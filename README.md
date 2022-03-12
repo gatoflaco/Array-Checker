@@ -92,22 +92,22 @@ Checking detecting property....
 DETECTING CHECK: [PASSED|FAILED]
 
 CONCLUSIONS:
-  The array is [not|] covering.
+  The array is [not|] t-covering.
   The array is [not|] (d, t)-locating.
-  The array is [not|] (d, t)-detecting.
-  [The separation is δ.|]
+  The array is [not|] (d, t, δ)-detecting.
+  [The greatest separation is actually Δ.|]
 ```
-- Note that d, t, and δ will be actual numbers. By default, d will be 1 and t will be 2, but they can be [specified](#command-line-arguments) when calling the executable.
-- The value of δ may or may not even be reported, as it only applies when the array is detecting. Note that this value of δ seen in the `CONCLUSION` section is the true separation, which may be higher than [the δ specified in the command line arguments](#command-line-arguments).
+- Note that d, t, and δ will be actual numbers. By default, d will be 1, t will be 2, and δ will be 1, but they can be [specified](#command-line-arguments) when calling the executable.
+- The value of Δ may or may not even be reported, as it only applies when the array is detecting, but the true separation is greater than what was requested by δ.
 - The output may be made more or less verbose than this using various [flags](#flags) on the command line. 
 - The `x_issue` lines are just indented lists of anything that violates property `x`. Their exact format depends on `x`. Below, an explanation of each is given alongside an example.
-  1. `coverage_issue`:
+1. `coverage_issue`:
 ```
 -- 3-WAY INTERACTION NOT PRESENT --
 {(f0, 2), (f2, 3), (f3, 0)}
 ```
   - This says that the 3-way interaction between factor 0 with value 2, factor 2 with value 3, and factor 3 with value 0, is not present on any row of the array. Note that different values of d do not affect this output; only t does. This example would be for a user-specified t = 3.
-  2. `location_issue`:
+2. `location_issue`:
 ```
 -- DISTINCT SETS WITH EQUAL ROWS --
 Set 1: { {(f0, 1), (f3, 0)}; {(f0, 1), (f3, 1)} }
@@ -115,7 +115,7 @@ Set 2: { {(f1, 1), (f3, 0)}; {(f1, 1), (f3, 1)} }
 rows: { 9, 10 }
 ```
   - This shows two sets of user-specified magnitude d = 2, each consisting of two 2-way interactions. The interpretation of this output is that the rows in which the first set of interactions occurs is equal to the rows in which the second set of interaction occurs, specifically rows 9 and 10. For more information on why this is an issue, refer to the [details and definitions](#details-and-definitions) section.
-  3. `detection_issue`:
+3. `detection_issue`:
 ```
 -- ROW DIFFERENCE LESS THAN 2 --
 Interaction: {(f0, 0), (f3, 2)}, { 2, 4 }
@@ -126,7 +126,7 @@ Difference: { 2 }
 
 ## Options
 The program may be invoked with a number of additional command line arguments and flags to alter its behavior. This is different from I/O redirection. Refer to the [usage](#usage) section for a better visual of what it looks like. This section describes the details:
-- Despite the simplified visual in the usage section, [Command line arguments](#command-line-arguments) and [flags](#flags) may actually come in either order. They are distingushed by a hyphen character (-).
+- Despite the simplified visual in the usage section, [command line arguments](#command-line-arguments) and [flags](#flags) may actually come in either order. They are distingushed by a hyphen character (-).
 - The command line arguments should *not* have leading hyphens and are simply delimited by whitespace. The relative order of these arguments **actually matters**. While flags can be mixed in anywhere between the arguments, the arguments are interpretted like this: the first integer encountered is assumed to be t. If a second integer is encountered, it is assumed to be d. If a third is encountered, it is assumed to be δ. This means that in order to specify d, you must also specify t, and in order to specify δ, you must also specify both d and t.
 - The flags are demarcated by a leading hyphen. Flags may use separate hyphens or share a single one. To "share" a single hyphen, additional flags beyond the first must succeed each other directly, i.e., without any whitespace. If whitespace is used between flags, a hyphen must be prepended for each whitespace-separated group of flags.
 - If the program cannot interpret a command line argument, it will ignore it and continue, possibly using default values/behaviors.
@@ -145,8 +145,8 @@ t: an integer bounded between 1 and the number of factors, inclusive
 - Goes unused if the c or l flags are given but not the d flag.
 ### Flags
 v: verbose
-- More output: simply states what values of d and t are in use, as well as the output mode, prior to reading input.
-- Rest of output format unchanged.
+- States what flags are set, as well as the values of d and t, prior to reading input. If detection is to be checked, also states the value of δ.
+- Continues checking properties even when an earlier property was found to fail. Because detecing implies locating, and locating implies covering, if the coverage or location check fails, the program will normally not bother to check the more strict properties as they fail by definition. In verbose mode, however, they will 
 
 h: halfway
 - Does not print any `coverage_issue`, `location_issue`, or `detection_issue`, but still signals what checks it is doing.

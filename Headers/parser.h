@@ -1,5 +1,5 @@
 /* LA-Checker by Isaac Jung
-Last updated 02/25/2022
+Last updated 03/11/2022
 
 |===========================================================================================================|
 |   This header contains a class used for processing input. Should the input format change, this class can  |
@@ -20,15 +20,66 @@ Last updated 02/25/2022
 #include <string>
 #include <vector>
 
+// typedef representing whether verbose mode is set
+// - v_off is normal
+// - v_on means more detail should be shown in output
+typedef enum {
+    v_off   = 0,
+    v_on    = 1
+} verb_mode;
+
+// typedef representing what sections of output to show
+// - normal displays everything
+// - halfway indicates what checks are happening but doesn't print any issues found
+// - silent only shows the final conclusion(s)
+typedef enum {
+    normal  = 0,
+    halfway = 1,
+    silent  = 2
+} out_mode;
+
+// typedef representing which properties to check for
+// - all checks coverage, location, and detection
+// - c_only only checks coverage
+// - l_only only checks location
+// - d_only only checks detection
+// - c_and_l checks coverage and location but not detection
+// - c_and_d checks coverage and detection but not location
+// - l_and_d checks location and detection but not coverage
+typedef enum {
+    all     = 0,
+    c_only  = 1,
+    l_only  = 2,
+    d_only  = 3,
+    c_and_l = 4,
+    c_and_d = 5,
+    l_and_d = 6
+} prop_mode;
+
 class Parser
 {
     public:
-        int num_rows = 0;
-        int num_cols = 0;
-        std::vector<int> levels;
-        std::vector<int*> array;
-        int process_input();
-        ~Parser();
+        // arguments
+        int d;  // magnitude of 𝒯 sets of t-way interactions
+        int t;  // strength of interactions
+        int δ;  // desired separation
+
+        // flags
+        verb_mode v;    // verbose mode, v_off by default
+        out_mode o;     // output mode, normal by default
+        prop_mode p;    // properties mode, all by default
+
+        // array stuff
+        int num_rows = 0;           // rows, or tests, in the array
+        int num_cols = 0;           // columns, or factors, in the array
+        std::vector<int> levels;    // levels associated with each factor
+        std::vector<int*> array;    // the array itself
+        int process_input();        // call this to process standard in
+
+        // constructor(s) and deconstructor
+        Parser();                       // default constructor, probably won't be used
+        Parser(int argc, char *argv[]); // constructor to read arguments and flags
+        ~Parser();                      // deconstructor
 
     private:
         void trim(std::string &s);

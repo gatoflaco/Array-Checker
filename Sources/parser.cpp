@@ -12,6 +12,40 @@ Last updated 02/25/2022
 #include <iostream>
 #include <algorithm>
 
+/* CONSTRUCTOR - initializes the object
+ * - overloaded: this is the default with no parameters, and should not be used
+*/
+Parser::Parser()
+{
+    d = 1; t = 2; δ = 1;
+    v = v_off; o = normal; p = all;
+}
+
+/* CONSTRUCTOR - initializes the object
+ * - overloaded: this version can set its fields based on the command line arguments
+*/
+Parser::Parser(int argc, char *argv[])
+{
+    
+    if (argc > 1) {
+        try {
+            d = atoi(argv[1]);
+        } catch (...) {
+            printf("WARNING: BAD ARG: %s\n\t- continuing with d = 1\n", argv[1]);
+        }
+        if (argc > 2) {
+            try {
+                t = atoi(argv[2]);
+            } catch (...) {
+                printf("WARNING: BAD ARG: %s\n\t- continuing with t = 2\n", argv[2]);
+            }
+        }
+        else {
+            printf("WARNING: EXPECTED ANOTHER ARG\n\t- continuing with t = 2\n");
+        }
+    }
+}
+
 /* SUB METHOD: process_input - reads from standard in to initialize program data
  * 
  * parameters:

@@ -45,17 +45,11 @@ class Factor
 class Interaction
 {
     public:
-        int strength;   // the interaction strength t is the number of (factor, value) tuples involved
+        //int strength;   // the interaction strength t is the number of (factor, value) tuples involved
         std::vector<std::tuple<Factor*, int>> factors;  // the actual list of (factor, value) tuples
 
         // this tracks the set of tests (represented as row numbers) in which this interaction occurs;
         std::set<int> ρ;    // this row coverage is vital to analyzing the locating and detecting properties
-        
-        // this helper bool is for remembering that this interaction is not locating; that is, it should be
-        bool is_locating;   // set true upon instantion, but false once determined to violate the property
-                            // once; it can be checked to cut down on computation time when false
-        
-        bool is_detecting;
 };
 
 #endif // FACTOR
