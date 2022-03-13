@@ -1,5 +1,5 @@
 /* LA-Checker by Isaac Jung
-Last updated 03/11/2022
+Last updated 03/13/2022
 
 |===========================================================================================================|
 |   This header contains a class used for processing input. Should the input format change, this class can  |
@@ -62,7 +62,7 @@ class Parser
         // arguments
         int d;  // magnitude of 𝒯 sets of t-way interactions
         int t;  // strength of interactions
-        int δ;  // desired separation
+        int delta;  // desired separation
 
         // flags
         verb_mode v;    // verbose mode, v_off by default

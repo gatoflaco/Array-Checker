@@ -1,5 +1,5 @@
 /* LA-Checker by Isaac Jung
-Last updated 02/25/2022
+Last updated 03/13/2022
 
 |===========================================================================================================|
 |   This file contains definitions for methods used to process input via an Parser class. Should the input  |
@@ -17,32 +17,69 @@ Last updated 02/25/2022
 */
 Parser::Parser()
 {
-    d = 1; t = 2; δ = 1;
+    d = 1; t = 2; delta = 1;
     v = v_off; o = normal; p = all;
 }
 
 /* CONSTRUCTOR - initializes the object
  * - overloaded: this version can set its fields based on the command line arguments
 */
-Parser::Parser(int argc, char *argv[])
+Parser::Parser(int argc, char *argv[]) : Parser()
 {
-    
-    if (argc > 1) {
-        try {
-            d = atoi(argv[1]);
-        } catch (...) {
-            printf("WARNING: BAD ARG: %s\n\t- continuing with d = 1\n", argv[1]);
-        }
-        if (argc > 2) {
-            try {
-                t = atoi(argv[2]);
-            } catch (...) {
-                printf("WARNING: BAD ARG: %s\n\t- continuing with t = 2\n", argv[2]);
+    int itr = 1, num_params = 0;
+    while (itr < argc) {
+        std::string arg(argv[itr]);    // cast to std::string
+        if (arg.at(0) == '-') { // flags
+            for (char c : arg.substr(1, arg.length() - 1)) {
+                switch(c) {
+                    case 'v':
+                        v = v_on;
+                        break;
+                    case 'h':
+                        o = halfway;
+                        break;
+                    case 's':
+                        o = silent;
+                        break;
+                    case 'c':
+                        if (p == c_only || p == c_and_l || p == c_and_d) break; // does nothing
+                        if (p == all) p = c_only;
+                        else if (p == l_only) p = c_and_l;
+                        else if (p == d_only) p = c_and_l;
+                        else p = all;
+                        break;
+                    case 'l':
+                        if (p == l_only || p == c_and_l || p == l_and_d) break; // does nothing
+                        if (p == all) p = l_only;
+                        else if (p == c_only) p = c_and_l;
+                        else if (p == d_only) p = l_and_d;
+                        else p = all;
+                        break;
+                    case 'd':
+                        if (p == d_only || p == c_and_d || p == l_and_d) break; // does nothing
+                        if (p == all) p = d_only;
+                        else if (p == c_only) p = c_and_d;
+                        else if (p == l_only) p = l_and_d;
+                        else p = all;
+                        break;
+                    default:    // do nothing
+                        break;
+                }
             }
         }
         else {
-            printf("WARNING: EXPECTED ANOTHER ARG\n\t- continuing with t = 2\n");
+            try {
+                int param = std::stoi(arg);
+                if (num_params < 1) t = param;
+                else if (num_params < 2) { d = t; t = param; }
+                else if (num_params < 3) delta = param;
+                else printf("NOTE: too many int arguments given; ignored <%s> (be sure to specify 3 at most)\n", arg.c_str());
+                num_params++;
+            } catch ( ... ) {
+                printf("NOTE: couldn't parse command line argument <%s> as int; ignored\n", arg.c_str());
+            }
         }
+        itr++;
     }
 }
 
@@ -56,7 +93,7 @@ Parser::Parser(int argc, char *argv[])
 */
 int Parser::process_input()
 {
-    printf("Reading input....\n\n");
+    if (o != silent) printf("Reading input....\n\n");
     int ret = 0;
     std::string cur_line;
 

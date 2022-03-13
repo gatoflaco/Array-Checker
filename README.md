@@ -1,4 +1,4 @@
-# EDIT 02/27/2022: REFACTORING IN PROGRESS, CODE WILL NOT COMPILE AT THE MOMENT
+# EDIT 03/13/2022: REFACTORING STILL IN PROGRESS, CODE WILL COMPILE BUT NOT FUNCTION CORRECTLY
 
 # Array-Checker
 ### Author: Isaac Jung
@@ -79,17 +79,17 @@ Checking coverage....
 
 COVERAGE CHECK: [PASSED|FAILED]
 
-Checking locating property....
+Checking location....
 
 [location_issue*]
 
-LOCATING CHECK: [PASSED|FAILED]
+LOCATION CHECK: [PASSED|FAILED]
 
-Checking detecting property....
+Checking detection....
 
 [detection_issue*]
 
-DETECTING CHECK: [PASSED|FAILED]
+DETECTION CHECK: [PASSED|FAILED]
 
 CONCLUSIONS:
   The array is [not|] t-covering.
@@ -127,8 +127,8 @@ Difference: { 2 }
 ## Options
 The program may be invoked with a number of additional command line arguments and flags to alter its behavior. This is different from I/O redirection. Refer to the [usage](#usage) section for a better visual of what it looks like. This section describes the details:
 - Despite the simplified visual in the usage section, [command line arguments](#command-line-arguments) and [flags](#flags) may actually come in either order. They are distingushed by a hyphen character (-).
-- The command line arguments should *not* have leading hyphens and are simply delimited by whitespace. The relative order of these arguments **actually matters**. While flags can be mixed in anywhere between the arguments, the arguments are interpretted like this: the first integer encountered is assumed to be t. If a second integer is encountered, it is assumed to be d. If a third is encountered, it is assumed to be δ. This means that in order to specify d, you must also specify t, and in order to specify δ, you must also specify both d and t.
-- The flags are demarcated by a leading hyphen. Flags may use separate hyphens or share a single one. To "share" a single hyphen, additional flags beyond the first must succeed each other directly, i.e., without any whitespace. If whitespace is used between flags, a hyphen must be prepended for each whitespace-separated group of flags.
+- The command line arguments should *not* have leading hyphens and are simply delimited by whitespace. The relative order of these arguments **actually matters**. While flags can be mixed in anywhere between the arguments, the arguments are interpretted like this: the first integer encountered is assumed to be t. If a second integer is encountered, it is assumed to be t with the previous t assumed to instead be d. If a third is encountered, it is assumed to be δ. This means that in order to specify d, you must also specify t, and in order to specify δ, you must also specify both d and t.
+- The flags are demarcated by a leading hyphen. Flags may use separate hyphens or share a single one. To "share" a single hyphen, additional flags beyond the first must succeed each other directly, i.e., without any whitespace. If whitespace is used between flags, a hyphen must be prepended for each of the whitespace-separated groups of flags.
 - If the program cannot interpret a command line argument, it will ignore it and continue, possibly using default values/behaviors.
 ### Command Line Arguments
 d: an integer bounded between 1 and t, inclusive
@@ -158,15 +158,15 @@ s: silent
 
 c: coverage
 - Coverage is computed and reported.
-- Can be combined with the l and d flags to report more than one thing. Not specifying any is the same as specifying all three.
+- Can be combined with the l and d flags to report more than one thing. Not specifying any is the same as specifying all three. Note that specifying all three and then continuing to specify more will "loop" the program's interpretation. e.g. -cldc will actually only check coverage.
 
 l: location
 - Location is computed and reported. This necessarily means coverage is computed internally, but the checking won't be shown unless the c flag is also set.
-- Can be combined with the l and d flags to report more than one thing. Not specifying any is the same as specifying all three.
+- Can be combined with the l and d flags to report more than one thing. Not specifying any is the same as specifying all three. Note that specifying all three and then continuing to specify more will "loop" the program's interpretation. e.g. -cd -lcl will actually check coverage and location.
 
 d: detection
 - Detection is computed and reported. This necessarily means coverage and location are computed internally, but the checking won't be shown unless the c and l flags are set, respectively.
-- Can be combined with the l and d flags to report more than one thing. Not specifying any is the same as specifying all three.
+- Can be combined with the l and d flags to report more than one thing. Not specifying any is the same as specifying all three. Note that specifying all three and then continuing to specify more will "loop" the program's interpretation. e.g. -dlcdlc -d will actually only check detection
 
 ## Details and Definitions
 The actual implementation of this program is simple in terms of flow. The program begins by getting input and then command line arguments. If all is fine, it passes the info from input to an Array object constructor, which organizes the data in the array into groups of vectors, sets, and so on, possibly with loose associations amongst themselves. When this is done, the main program simply calls Array methods on the instantiated object to perform each check requested. If any of the less strict checks fail, by definition the more strict ones will too, so the program doesn't bother computing them and jumps to a conclusion. Because of the dependencies of later checks on previous ones passing, the execution trace is linear, and does not lend itself to multithreading at a surface level. The complexity comes from how the internal data structures are created and the way different parameters affect this logic. Once they have been created, it isn't actually hard to understand how the code in each check relates to the definitions of what they should do. The organization of data structures and the way they are traversed may be able to be made more efficient with threads, but the decision was made to avoid further code complexity with the tradeoff of less efficiency. The reason for this decision is that the single threaded solutions are already reasonably fast. For example, checking `Sample-Input/LA_LARGE.tsv` for (1, 2)-location only takes about 1 minute on a virtual machine with 4096 MB base memory and a single processor allocated to it. Within that file is a valid (1, 2)-locating array of 421 tests by 75 factors, where each factor has anywhere between 2 to 10 levels.

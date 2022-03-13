@@ -1,5 +1,5 @@
 /* LA-Checker by Isaac Jung
-Last updated 02/22/2022
+Last updated 03/13/2022
 
 |===========================================================================================================|
 
@@ -23,10 +23,10 @@ static prop_mode pm; // property mode
 
 // =========================v=v=v== static methods - forward declarations ==v=v=v========================= //
 
-static void verbose_print(int d, int t, int δ);
+static void verbose_print(int d, int t, int delta);
 static int conclusion(int t, bool is_covering);
 static int conclusion(int d, int t, bool is_covering, bool is_locating);
-static int conclusion(int d, int t, int δ, bool is_covering, bool is_locating, bool is_detecting);
+static int conclusion(int d, int t, int delta, bool is_covering, bool is_locating, bool is_detecting);
 
 // =========================^=^=^== static methods - forward declarations ==^=^=^========================= //
 
@@ -44,14 +44,15 @@ static int conclusion(int d, int t, int δ, bool is_covering, bool is_locating, 
 int main(int argc, char *argv[])
 {
     Parser p(argc, argv);   // create Parser object that immediately processes arguments and flags
-    int d = p.d, t = p.t, δ = p.δ;  // set values of d, t, and δ based on those processed by the Parser
+    int d = p.d, t = p.t, delta = p.delta;  // set values of d, t, and δ based on those processed by the Parser
     vm = p.v; om = p.o; pm = p.p;   // update flags based on those processed by the Parser
-    if (vm == v_on) verbose_print(d, t, δ); // introductory status print when verbose mode enabled
+    if (vm == v_on) verbose_print(d, t, delta); // introductory status print when verbose mode enabled
 	int status = p.process_input();  // read in and process the array
     if (status == -1) return 1; // exit immediately if there is a basic syntactic or semantic error
     if (status == 1) return 1;  // less trivial issue; another option: return conclusion(t, false);
     
-    Array array(&p, d, t, δ);   // create Array object that immediately builds appropriate data structures
+    Array array(&p, d, t, delta);   // create Array object that immediately builds appropriate data structures
+    array.o = om;   // update the array's output mode
     bool is_covering = true, is_locating = true, is_detecting = true;
     if (pm == all || pm == c_only || pm == c_and_l || pm == c_and_d) {  // check coverage if requested
         is_covering = array.is_covering();
@@ -63,9 +64,9 @@ int main(int argc, char *argv[])
     }
     if (pm == all || pm == d_only || pm == c_and_d || pm == l_and_d) {  // check detection if requested
         is_detecting = array.is_detecting();
-        if (!is_detecting) return conclusion(d, t, δ, is_covering, is_locating, false);
-        conclusion(d, t, δ, is_covering, is_locating, true);
-        if (array.Δ > δ) printf("The greatest separation is actually %d.\n", array.Δ);
+        if (!is_detecting) return conclusion(d, t, delta, is_covering, is_locating, false);
+        conclusion(d, t, delta, is_covering, is_locating, true);
+        if (array.true_delta > delta) printf("The greatest separation is actually %d.\n", array.true_delta);
         return 0;
     }
 
@@ -77,12 +78,12 @@ int main(int argc, char *argv[])
  * parameters:
  * - d: value of d read from the command line (default should be 1)
  * - t: value of t read from the command line (default should be 2)
- * - δ: value of δ read from the command line (default should be 1)
+ * - delta: value of δ read from the command line (default should be 1)
  * 
  * returns:
  * - void; simply prints to console
 */
-static void verbose_print(int d, int t, int δ) {
+static void verbose_print(int d, int t, int delta) {
     int pid = getpid();
     printf("==%d== Verbose mode enabled\n", pid);
     if (om == normal) printf("==%d== Output mode: normal\n", pid);
@@ -91,7 +92,7 @@ static void verbose_print(int d, int t, int δ) {
     else printf("==%d== Output mode: UNDEFINED\n", pid);
     if (pm == all) {
         printf("==%d== Checking: coverage, location, detection\n", pid);
-        printf("==%d== Using d = %d, t = %d, δ = %d\n", pid, d, t, δ);
+        printf("==%d== Using d = %d, t = %d, δ = %d\n", pid, d, t, delta);
     } else if (pm == c_only) {
         printf("==%d== Checking: coverage\n", pid);
         printf("==%d== Using t = %d\n", pid, t);
@@ -100,20 +101,21 @@ static void verbose_print(int d, int t, int δ) {
         printf("==%d== Using d = %d, t = %d\n", pid, d, t);
     } else if (pm == d_only) {
         printf("==%d== Checking: detection\n", pid);
-        printf("==%d== Using d = %d, t = %d, δ = %d\n", pid, d, t, δ);
+        printf("==%d== Using d = %d, t = %d, δ = %d\n", pid, d, t, delta);
     } else if (pm == c_and_l) {
         printf("==%d== Checking: coverage, location\n", pid);
         printf("==%d== Using d = %d, t = %d\n", pid, d, t);
     } else if (pm == c_and_d) {
         printf("==%d== Checking: coverage, detection\n", pid);
-        printf("==%d== Using d = %d, t = %d, δ = %d\n", pid, d, t, δ);
+        printf("==%d== Using d = %d, t = %d, δ = %d\n", pid, d, t, delta);
     } else if (pm == l_and_d) {
         printf("==%d== Checking: location, detection\n", pid);
-        printf("==%d== Using d = %d, t = %d, δ = %d\n", pid, d, t, δ);
+        printf("==%d== Using d = %d, t = %d, δ = %d\n", pid, d, t, delta);
     } else {
-        printf("==%d== No properties to check\nQuitting...");
+        printf("==%d== No properties to check\nQuitting...\n");
         exit(1);
     }
+    printf("\n");
 }
 
 /* HELPER METHOD: conclusion - prints a final conclusion for the user
@@ -160,7 +162,7 @@ static int conclusion(int d, int t, bool is_covering, bool is_locating)
  * parameters:
  * - d: the number of t-way interactions in a 𝒯 (set of interactions)
  * - t: the strength of interactions (how many (factor, values) in the interaction)
- * - δ: the desired separation (only used for checking detection, check README for info)
+ * - delta: the desired separation (only used for checking detection, check README for info)
  * - is_covering: whether or not the array has t-way coverage
  * - is_locating: whether or not the array is a (d, t)-locating array
  * - is_detecting: whether or not the array is a locating array
@@ -168,10 +170,10 @@ static int conclusion(int d, int t, bool is_covering, bool is_locating)
  * returns:
  * - always 0, allowing the caller to return the return from this function, representing success
 */
-static int conclusion(int d, int t, int δ, bool is_covering, bool is_locating, bool is_detecting)
+static int conclusion(int d, int t, int delta, bool is_covering, bool is_locating, bool is_detecting)
 {
     conclusion(d, t, is_covering, is_locating);
     if (pm == all || pm == d_only || pm == c_and_d || pm == l_and_d)
-        printf("The array %s (%d, %d, %d)-detecting.", (is_detecting ? "is" : "is not"), d, t, δ);
+        printf("The array %s (%d, %d, %d)-detecting.\n", (is_detecting ? "is" : "is not"), d, t, delta);
     return 0;
 }

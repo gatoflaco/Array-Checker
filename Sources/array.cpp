@@ -1,13 +1,13 @@
 /* LA-Checker by Isaac Jung
-Last updated 02/22/2022
+Last updated 03/13/2022
 
 |===========================================================================================================|
 |   This file containes the meat of this project's logic. The constructor for the Array class has a pointer |
 | to an InputInfo object which should have already called its process_info() method. Using that, the Array  |
 | object under construction is able to organize the data structures that support the analysis of the given  |
-| locating array. The has_strength_2() and has_locating_property() methods can then be called at will.      |
-| The has_strength_2() method simply ensures that all possible 2-way interactions are present in the array. |
-| The has_locating_property() method checks every row, every pair of interactions, and ensures that the set |
+| locating array. The is_covering() and is_locating() methods can then be called at will.      |
+| The is_covering() method simply ensures that all possible 2-way interactions are present in the array. |
+| The is_locating() method checks every row, every pair of interactions, and ensures that the set |
 | of rows in which one interaction occurs is not a subset of the set of rows in which the other occurs. To  |
 | better understand the purpose of these methods and their logic, refer to the README.                      |
 |===========================================================================================================| 
@@ -23,12 +23,38 @@ static void print_failure(int i1f1, int i1v1, int i1f2, int i1v2, std::set<int> 
     int i2f1, int i2v1, int i2f2, int i2v2);
 
 /* CONSTRUCTOR - initializes the object
+ * - overloaded: this is the default with no parameters, and should not be used
 */
-Array::Array(Parser *in)
+Array::Array()
 {
+    d = -1; t = -1; delta = -1; true_delta = -1;
+    num_tests = -1; num_factors = -1;
+    factors = nullptr;
+}
+
+/* CONSTRUCTOR - initializes the object
+ * - overloaded: this version can set its fields based on its parameters
+*/
+Array::Array(Parser *in, int d_in, int t_in, int delta_in)
+{
+    d = d_in; t = t_in; delta = delta_in;
+    true_delta = INT32_MAX;  // use a ridiculously high value to represent non-initialized
     num_tests = in->num_rows;
     num_factors = in->num_cols;
+    if(d <= 0 && d > num_tests) {
+        printf("NOTE: bad value for d, continuing with d = 1\n");
+        d = 1;
+    }
+    if(t <= 0 && t > num_factors) {
+        printf("NOTE: bad value for t, continuing with t = 2\n");
+        t = 2;
+    }
+    if(delta <= 0) {
+        printf("NOTE: bad value for δ, continuing with δ = 1\n");
+        delta = 1;
+    }
     factors = new Factor[num_factors];
+    /*
     for (int row = 0; row < num_tests; row++) {
         rows.push_back(Row());
     }
@@ -68,9 +94,10 @@ Array::Array(Parser *in)
     factors[num_factors-1].level = in->levels.at(num_factors-1);
     factors[num_factors-1].interactions_size = 0;
     factors[num_factors-1].interactions = nullptr;
+    */
 }
 
-/* SUB METHOD: has_strength_2 - performs the analysis for coverage
+/* SUB METHOD: is_covering - performs the analysis for coverage
  * 
  * parameters:
  * - none
@@ -78,10 +105,11 @@ Array::Array(Parser *in)
  * returns:
  * - true if the array has strength 2, false if not
 */
-bool Array::has_strength_2()
+bool Array::is_covering()
 {
-    printf("Checking coverage....\n\n");
+    if (o != silent) printf("Checking coverage....\n\n");
     bool passed = true;
+    /* TODO: fix this
     int idx;
     for (int i = 0; i < num_factors - 1; i++) { // for every factor (column) but the last
         idx = 0;
@@ -97,22 +125,24 @@ bool Array::has_strength_2()
             idx++;
         }
     }
-    printf("COVERAGE CHECK: %s\n\n", passed ? "PASSED" : "FAILED");
+    */
+    if (o != silent) printf("COVERAGE CHECK: %s\n\n", passed ? "PASSED" : "FAILED");
     return passed;
 }
 
-/* SUB METHOD: has_locating_property - performs the analysis for the locating property
+/* SUB METHOD: is_locating - performs the analysis for location
  * 
  * parameters:
  * - none
  * 
  * returns:
- * - true if the array has the locating property, false if not
+ * - true if the array has location, false if not
 */
-bool Array::has_locating_property()
+bool Array::is_locating()
 {
-    printf("Checking locating property....\n\n");
+    if (o != silent) printf("Checking location....\n\n");
     bool passed = true;
+    /* TODO: fix this
     int num_interactions = num_factors*(num_factors-1)/2;
     std::set<int> *occurrences1, *occurrences2;
     
@@ -145,11 +175,28 @@ bool Array::has_locating_property()
                         occurrences1);
                     test.interactions.at(i2)->is_locating = false;
                     passed = false;
-                }//*/
+                }//
             }
         }
     }
-    printf("LOCATING CHECK: %s\n\n", passed ? "PASSED" : "FAILED");
+    */
+    if (o != silent) printf("LOCATION CHECK: %s\n\n", passed ? "PASSED" : "FAILED");
+    return passed;
+}
+
+/* SUB METHOD: is_detecting - performs the analysis for location
+ * 
+ * parameters:
+ * - none
+ * 
+ * returns:
+ * - true if the array has location, false if not
+*/
+bool Array::is_detecting()
+{
+    if (o != silent) printf("Checking detection....\n\n");
+    bool passed = true;
+    if (o != silent) printf("DETECTION CHECK: %s\n\n", passed ? "PASSED" : "FAILED");
     return passed;
 }
 
