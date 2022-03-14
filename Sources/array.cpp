@@ -53,7 +53,7 @@ Array::Array(Parser *in, int d_in, int t_in, int delta_in)
         printf("NOTE: bad value for δ, continuing with δ = 1\n");
         delta = 1;
     }
-    factors = new Factor[num_factors];
+    //factors = new Factor[num_factors];
     /*
     for (int row = 0; row < num_tests; row++) {
         rows.push_back(Row());
@@ -204,7 +204,7 @@ bool Array::is_detecting()
 */
 Array::~Array()
 {
-    delete[] factors;
+    //delete[] factors;
 }
 
 

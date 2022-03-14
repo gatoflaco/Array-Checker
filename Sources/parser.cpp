@@ -45,7 +45,7 @@ Parser::Parser(int argc, char *argv[]) : Parser()
                         if (p == c_only || p == c_and_l || p == c_and_d) break; // does nothing
                         if (p == all) p = c_only;
                         else if (p == l_only) p = c_and_l;
-                        else if (p == d_only) p = c_and_l;
+                        else if (p == d_only) p = c_and_d;
                         else p = all;
                         break;
                     case 'l':

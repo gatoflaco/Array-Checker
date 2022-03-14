@@ -9,6 +9,16 @@ Last updated 02/25/2022
 
 #include "factor.h"
 
+/* CONSTRUCTOR - initializes the object
+*/
+Factor::Factor()
+{
+    id = -1;
+    level = -1;
+    interactions_size = 0;
+    interactions = nullptr;
+}
+
 /* DECONSTRUCTOR - frees memory
 */
 Factor::~Factor()

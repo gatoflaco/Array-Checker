@@ -46,6 +46,7 @@ class Factor
         int level;
         int interactions_size;
         Interaction **interactions;
+        Factor();
         ~Factor();
 };
 
