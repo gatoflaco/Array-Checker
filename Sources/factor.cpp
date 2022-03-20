@@ -8,6 +8,7 @@ Last updated 03/20/2022
 */
 
 #include "factor.h"
+#include <algorithm>
 
 /* CONSTRUCTOR - initializes the object
  * - overloaded: this is the default with no parameters, and should not be used
@@ -26,6 +27,33 @@ Single::Single(int f, int v)
     factor = f;
     value = v;
     // rows will be built later
+}
+
+/* CONSTRUCTOR - initializes the object
+ * - overloaded: this is the default with no parameters, and should not be used
+*/
+Interaction::Interaction()
+{
+    // nothing to do
+}
+
+/* CONSTRUCTOR - initializes the object
+ * - overloaded: this version can set its fields based on a premade vector of Single pointers
+*/
+Interaction::Interaction(std::vector<Single*> *s)
+{
+    // fencepost start: let the Interaction be the strength 1 interaction involving just the 0th Single in s
+    singles.push_back(s->at(0));
+    rows = s->at(0)->rows;
+
+    // fencepost loop: for any t > 1, rows of the Interaction is the intersection of each Single's rows
+    for (int i = 1; i < s->size(); i++) {
+      singles.push_back(s->at(i));
+      std::set<int> temp;
+      std::set_intersection(rows.begin(), rows.end(),
+        s->at(i)->rows.begin(), s->at(i)->rows.end(), std::inserter(temp, temp.begin()));
+      rows = temp;
+    }
 }
 
 /* CONSTRUCTOR - initializes the object

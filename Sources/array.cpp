@@ -18,26 +18,15 @@ Last updated 03/20/2022
 #include "array.h"
 #include <iostream>
 #include <algorithm>
+#include <sys/types.h>
+#include <unistd.h>
 
 // method forward declarations
 static void print_failure(int f1, int v1, int f2, int v2);
 static void print_failure(int i1f1, int i1v1, int i1f2, int i1v2, std::set<int> *rows,
     int i2f1, int i2v1, int i2f2, int i2v2);
-
-// temporary helper method for checking correctness, will eventually be deleted
-static void print_singles(Factor **factors, int num_factors)
-{
-    for (int col = 0; col < num_factors; col++) {
-        printf("Factor %d:\n", factors[col]->id);
-        for (int level = 0; level < factors[col]->level; level++) {
-            printf("\t(%d, %d):", factors[col]->singles[level]->factor, factors[col]->singles[level]->value);
-            for (int row : factors[col]->singles[level]->rows) printf(" %d", row);
-            printf("\n");
-        }
-        printf("\n");
-    }
-    printf("\n");
-}
+static void print_singles(Factor **factors, int num_factors);
+static void print_interactions(std::vector<Interaction*> interactions);
 
 /* CONSTRUCTOR - initializes the object
  * - overloaded: this is the default with no parameters, and should not be used
@@ -86,7 +75,9 @@ Array::Array(Parser *in)
     if (v == v_on) print_singles(factors, num_factors);
 
     // build all Interactions
-    // TODO
+    std::vector<Single*> temp;
+    build_t_way_interactions(0, t, &temp);
+    if (v == v_on) print_interactions(interactions);
 
     //factors = new Factor[num_factors];
     /*
@@ -132,9 +123,23 @@ Array::Array(Parser *in)
     */
 }
 
-void Array::build_t_way_interactions(int i, int t, std::vector<Single*> interaction_so_far)
+void Array::build_t_way_interactions(int start, int t, std::vector<Single*> *interaction_so_far)
 {
+    // base case: interaction is completed and ready to store
+    if (t == 0) {
+        Interaction *new_interaction = new Interaction(interaction_so_far);
+        interactions.push_back(new_interaction);
+        return;
+    }
 
+    // recursive case: need to introduce another loop for higher strength
+    for (int col = start; col < num_factors - t + 1; col++) {
+        for (int level = 0; level < factors[col]->level; level++) {
+            interaction_so_far->push_back(factors[col]->singles[level]);  // note these are Single *
+            build_t_way_interactions(col+1, t-1, interaction_so_far);
+            interaction_so_far->pop_back();
+        }
+    }
 }
 
 /* SUB METHOD: is_covering - performs the analysis for coverage
@@ -246,6 +251,7 @@ Array::~Array()
 {
     for (int i = 0; i < num_factors; i++) delete factors[i];
     delete[] factors;
+    for (Interaction *i : interactions) delete i;
 }
 
 
@@ -268,4 +274,33 @@ static void print_failure(int i1f1, int i1v1, int i1f2, int i1v2, std::set<int> 
     std::string str = "";
     for (int row : *rows) str += std::to_string(row + 1) + ", ";
     printf("%s }\n\n", str.substr(0, str.size() - 2).c_str());
+}
+
+static void print_singles(Factor **factors, int num_factors)
+{
+    int pid = getpid();
+    printf("==%d== Listing all Singles below:\n\n", pid);
+    for (int col = 0; col < num_factors; col++) {
+        printf("Factor %d:\n", factors[col]->id);
+        for (int level = 0; level < factors[col]->level; level++) {
+            printf("\t(f%d, %d): {", factors[col]->singles[level]->factor, factors[col]->singles[level]->value);
+            for (int row : factors[col]->singles[level]->rows) printf(" %d", row);
+            printf(" }\n");
+        }
+        printf("\n");
+    }
+}
+
+static void print_interactions(std::vector<Interaction*> interactions)
+{
+    int pid = getpid();
+    printf("==%d== Listing all Interactions below:\n\n", pid);
+    int i = 0;
+    for (Interaction *interaction : interactions) {
+        printf("%d:\nints: {", ++i);
+        for (Single *s : interaction->singles) printf(" (f%d, %d)", s->factor, s->value);
+        printf(" }\nrows: {");
+        for (int row : interaction->rows) printf(" %d", row);
+        printf(" }\n\n");
+    }
 }

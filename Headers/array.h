@@ -1,5 +1,5 @@
 /* LA-Checker by Isaac Jung
-Last updated 03/19/2022
+Last updated 03/20/2022
 
 |===========================================================================================================|
 |   This header contains classes for managing the array in an automated fashion. The Row class is just a    |
@@ -69,9 +69,9 @@ class Array
 
         // this utility method is called in the constructor to fill out the vector of all interactions
         // almost certainly needs to be recursive in order to handle arbitrary values of t
-        void build_t_way_interactions(int i, int t, std::vector<Single*> interaction_so_far);
+        void build_t_way_interactions(int start, int t, std::vector<Single*> *interaction_so_far);
 
         // after the above method completes, call this one to fill out the set of all size-d sets
         // almost certainly needs to be recursive in order to handle arbitrary values of d
-        void build_size_d_Ts(int i, int d, std::set<Interaction*> set_so_far);
+        void build_size_d_Ts(int start, int d, std::set<Interaction*> *set_so_far);
 };

@@ -33,10 +33,13 @@ class Interaction
 {
     public:
         //int strength;   // the interaction strength t is the number of (factor, value) tuples involved
-        std::vector<Single> factors;  // the actual list of (factor, value) tuples
+        std::vector<Single*> singles;   // the actual list of (factor, value) tuples
 
         // this tracks the set of tests (represented as row numbers) in which this interaction occurs;
         std::set<int> rows;    // this row coverage is vital to analyzing the locating and detecting properties
+
+        Interaction();   // default constructor, don't use this
+        Interaction(std::vector<Single*> *s);   // constructor that takes a premade vector of Single pointers
 };
 
 // think of this class as containing the information associated with a single column in the array
