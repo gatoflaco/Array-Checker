@@ -28,17 +28,19 @@ static void print_failure(int i1f1, int i1v1, int i1f2, int i1v2, std::set<int> 
 Array::Array()
 {
     d = -1; t = -1; delta = -1; true_delta = -1;
+    v = v_off; o = normal; p = all;
     num_tests = -1; num_factors = -1;
     factors = nullptr;
 }
 
 /* CONSTRUCTOR - initializes the object
- * - overloaded: this version can set its fields based on its parameters
+ * - overloaded: this version can set its fields based on a Parser object
 */
-Array::Array(Parser *in, int d_in, int t_in, int delta_in)
+Array::Array(Parser *in)
 {
-    d = d_in; t = t_in; delta = delta_in;
+    d = in->d; t = in->t; delta = in->delta;
     true_delta = INT32_MAX;  // use a ridiculously high value to represent non-initialized
+    v = in->v; o = in->o; p = in->p;
     num_tests = in->num_rows;
     num_factors = in->num_cols;
     if(d <= 0 && d > num_tests) {
@@ -105,9 +107,9 @@ Array::Array(Parser *in, int d_in, int t_in, int delta_in)
  * returns:
  * - true if the array has strength 2, false if not
 */
-bool Array::is_covering()
+bool Array::is_covering(bool report)
 {
-    if (o != silent) printf("Checking coverage....\n\n");
+    if (report && o != silent) printf("Checking coverage....\n\n");
     bool passed = true;
     /* TODO: fix this
     int idx;
@@ -126,7 +128,7 @@ bool Array::is_covering()
         }
     }
     */
-    if (o != silent) printf("COVERAGE CHECK: %s\n\n", passed ? "PASSED" : "FAILED");
+    if (report && o != silent) printf("COVERAGE CHECK: %s\n\n", passed ? "PASSED" : "FAILED");
     return passed;
 }
 
@@ -138,9 +140,9 @@ bool Array::is_covering()
  * returns:
  * - true if the array has location, false if not
 */
-bool Array::is_locating()
+bool Array::is_locating(bool report)
 {
-    if (o != silent) printf("Checking location....\n\n");
+    if (report && o != silent) printf("Checking location....\n\n");
     bool passed = true;
     /* TODO: fix this
     int num_interactions = num_factors*(num_factors-1)/2;
@@ -180,7 +182,7 @@ bool Array::is_locating()
         }
     }
     */
-    if (o != silent) printf("LOCATION CHECK: %s\n\n", passed ? "PASSED" : "FAILED");
+    if (report && o != silent) printf("LOCATION CHECK: %s\n\n", passed ? "PASSED" : "FAILED");
     return passed;
 }
 
@@ -192,11 +194,11 @@ bool Array::is_locating()
  * returns:
  * - true if the array has location, false if not
 */
-bool Array::is_detecting()
+bool Array::is_detecting(bool report)
 {
-    if (o != silent) printf("Checking detection....\n\n");
+    if (report && o != silent) printf("Checking detection....\n\n");
     bool passed = true;
-    if (o != silent) printf("DETECTION CHECK: %s\n\n", passed ? "PASSED" : "FAILED");
+    if (report && o != silent) printf("DETECTION CHECK: %s\n\n", passed ? "PASSED" : "FAILED");
     return passed;
 }
 

@@ -1,5 +1,5 @@
 /* LA-Checker by Isaac Jung
-Last updated 03/13/2022
+Last updated 03/19/2022
 
 |===========================================================================================================|
 |   This header contains classes used for organizing data associated with the arrays used by check.cpp. See |
@@ -21,10 +21,11 @@ Last updated 03/13/2022
 class Single
 {
     public:
-        int f;  // represents the factor, or column of the array
-        int v;  // represents the actual value of the factor
+        int factor; // represents the factor, or column of the array
+        int value;  // represents the actual value of the factor
         std::set<int> rows;    // tracks the set of rows in which this (factor, value) occurs
-
+        Single();   // default constructor, don't use this
+        Single(int f, int v);   // constructor that takes the (factor, value)
 };
 
 // only for 2-way interactions; not yet generalized to any t-way interaction
@@ -44,9 +45,9 @@ class Factor
     public:
         int id;
         int level;
-        int interactions_size;
-        Interaction **interactions;
-        Factor();
+        Single **singles;
+        Factor();   // default constructor, don't use this
+        Factor(int i, int l);
         ~Factor();
 };
 

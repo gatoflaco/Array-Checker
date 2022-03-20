@@ -1,5 +1,5 @@
 /* LA-Checker by Isaac Jung
-Last updated 03/13/2022
+Last updated 03/19/2022
 
 |===========================================================================================================|
 
@@ -51,26 +51,36 @@ int main(int argc, char *argv[])
     if (status == -1) return 1; // exit immediately if there is a basic syntactic or semantic error
     if (status == 1) return 1;  // less trivial issue; another option: return conclusion(t, false);
     
-    Array array(&p, d, t, delta);   // create Array object that immediately builds appropriate data structures
-    array.o = om;   // update the array's output mode
-    bool is_covering = true, is_locating = true, is_detecting = true;
-    if (pm == all || pm == c_only || pm == c_and_l || pm == c_and_d) {  // check coverage if requested
-        is_covering = array.is_covering();
-        if (!is_covering && vm == v_off) return conclusion(t, false);
-    }
-    if (pm == all || pm == l_only || pm == c_and_l || pm == l_and_d) {  // check location if requested
-        is_locating = array.is_locating();
-        if (!is_locating && vm == v_off) return conclusion(d, t, is_covering, false);
-    }
-    if (pm == all || pm == d_only || pm == c_and_d || pm == l_and_d) {  // check detection if requested
-        is_detecting = array.is_detecting();
-        if (!is_detecting) return conclusion(d, t, delta, is_covering, is_locating, false);
-        conclusion(d, t, delta, is_covering, is_locating, true);
-        if (array.true_delta > delta) printf("The greatest separation is actually %d.\n", array.true_delta);
-        return 0;
-    }
+    Array array(&p);    // create Array object that immediately builds appropriate data structures
+    bool is_covering = false, is_locating = false, is_detecting = false;
+    
+    // checking coverage must always happen, but whether to show output depends on property mode
+    if (pm == all || pm == c_only || pm == c_and_l || pm == c_and_d)
+        is_covering = array.is_covering(true);  // show output according to output mode
+    else
+        is_covering = array.is_covering(false); // don't show output (l and/or d flagged but not c)
 
-    return conclusion(d, t, is_covering, is_locating);  // note overloaded detection version cases covered above
+    // may skip location check if array lacks coverage and verbose mode is disabled
+    if (!is_covering && vm == v_off) is_locating = false;
+    else    // may need to check location, and whether to show output depends on property mode
+        if (pm == all || pm == l_only || pm == c_and_l || pm == l_and_d)
+            is_locating = is_covering && array.is_locating(true);  // show output according to output mode
+        else if (pm == d_only || pm == c_and_d);
+            is_locating = is_covering && array.is_locating(false); // don't show output (d flagged but not l)
+        // else property mode is c_only and location should not be computed
+    
+    // may skip detection check if array lacks location and verbose mode is disabled
+    if (!is_locating && vm == v_off) is_detecting = false;
+    else    // check detection if property mode is anything involving the d flag
+        if (pm == all || pm == d_only || pm == c_and_d || pm == l_and_d) {  // check detection if requested
+            is_detecting = is_locating && array.is_detecting();
+            if (!is_detecting) return conclusion(d, t, delta, is_covering, is_locating, false);
+            conclusion(d, t, delta, is_covering, is_locating, true);
+            if (array.true_delta > delta) printf("The greatest separation is actually %d.\n", array.true_delta);
+            return 0;
+        }   // else property mode is c_only, l_only, or c_and_l and detection should not be computed
+
+    return conclusion(d, t, delta, is_covering, is_locating, is_detecting);
 }
 
 /* HELPER METHOD: verbose_print - prints the introductory status when verbose mode is enabled
