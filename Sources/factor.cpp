@@ -1,5 +1,5 @@
 /* LA-Checker by Isaac Jung
-Last updated 03/19/2022
+Last updated 03/20/2022
 
 |===========================================================================================================|
 |   This file contains just the deconstructor for the Factor class. The Interaction class, which is also    |
@@ -41,17 +41,17 @@ Factor::Factor()
 /* CONSTRUCTOR - initializes the object
  * - overloaded: this version can set its fields based on parameters
 */
-Factor::Factor(int i, int l)
+Factor::Factor(int i, int l, Single **ptr_array)
 {
     id = i;
     level = l;
-    singles = nullptr;  // this will be built later
+    singles = ptr_array;
 }
 
 /* DECONSTRUCTOR - frees memory
 */
 Factor::~Factor()
 {
-    // for (int i = 0; i < level; i++) delete[] singles[i];
+    for (int i = 0; i < level; i++) delete singles[i];
     delete[] singles;
 }

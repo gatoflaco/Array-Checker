@@ -24,7 +24,7 @@ The purpose of this program is to verify whether test suites of enumerated 2-dim
 
 ## Usage
 ```
-./check [d|] [t|] [δ|] [-[flags*|]|]
+./check [d|] [t|] [δ|] [-[flags*]|]
 ```
 Example (including input redirection, **which is recommended**):
 ```

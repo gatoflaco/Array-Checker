@@ -63,7 +63,7 @@ class Array
         prop_mode p;    // this is used to avoid building sets if it won't be needed anyway
         int num_tests;      // just a field to reference the upper bound on iterating through rows
         int num_factors;    // just a field to reference the upper bound on iterating through columns
-        Factor *factors;    // pointer to the start of an array of Factor objects placed next to each other
+        Factor **factors;    // pointer to the start of an array of pointers to Factor objects
         std::set<T*> sets;  // a set of all size-d sets of t-way interactions constructable from the array
         std::vector<Interaction*> interactions; // list of all individual interactions
 

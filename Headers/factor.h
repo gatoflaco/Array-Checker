@@ -1,5 +1,5 @@
 /* LA-Checker by Isaac Jung
-Last updated 03/19/2022
+Last updated 03/20/2022
 
 |===========================================================================================================|
 |   This header contains classes used for organizing data associated with the arrays used by check.cpp. See |
@@ -47,7 +47,7 @@ class Factor
         int level;
         Single **singles;
         Factor();   // default constructor, don't use this
-        Factor(int i, int l);
+        Factor(int i, int l, Single **ptr_array);
         ~Factor();
 };
 

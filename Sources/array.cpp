@@ -1,15 +1,17 @@
 /* LA-Checker by Isaac Jung
-Last updated 03/13/2022
+Last updated 03/20/2022
 
 |===========================================================================================================|
 |   This file containes the meat of this project's logic. The constructor for the Array class has a pointer |
 | to an InputInfo object which should have already called its process_info() method. Using that, the Array  |
 | object under construction is able to organize the data structures that support the analysis of the given  |
-| locating array. The is_covering() and is_locating() methods can then be called at will.      |
-| The is_covering() method simply ensures that all possible 2-way interactions are present in the array. |
-| The is_locating() method checks every row, every pair of interactions, and ensures that the set |
-| of rows in which one interaction occurs is not a subset of the set of rows in which the other occurs. To  |
-| better understand the purpose of these methods and their logic, refer to the README.                      |
+| locating array. The is_covering(), is_locating(), and is_detecting() methods can then be called at will.  |
+| The is_covering() method simply ensures that all possible t-way interactions are present in the array.    |
+| The is_locating() method checks every pair of size-d sets of t-way interactions, and ensures that the set |
+| of rows in which one set of interactions occurs is not equal to the set of rows in which the other does.  |
+| The is_detecting() method compares all t-way interactions with all size-d sets of interactions to ensure  |
+| that if the interaction is not part of the set, it must occur in at least δ rows distinct from those in   |
+| in which the set occurs. For a better understanding these methods and their logic, refer to the README.   |
 |===========================================================================================================| 
 */
 
@@ -21,6 +23,21 @@ Last updated 03/13/2022
 static void print_failure(int f1, int v1, int f2, int v2);
 static void print_failure(int i1f1, int i1v1, int i1f2, int i1v2, std::set<int> *rows,
     int i2f1, int i2v1, int i2f2, int i2v2);
+
+// temporary helper method for checking correctness, will eventually be deleted
+static void print_singles(Factor **factors, int num_factors)
+{
+    for (int col = 0; col < num_factors; col++) {
+        printf("Factor %d:\n", factors[col]->id);
+        for (int level = 0; level < factors[col]->level; level++) {
+            printf("\t(%d, %d):", factors[col]->singles[level]->factor, factors[col]->singles[level]->value);
+            for (int row : factors[col]->singles[level]->rows) printf(" %d", row);
+            printf("\n");
+        }
+        printf("\n");
+    }
+    printf("\n");
+}
 
 /* CONSTRUCTOR - initializes the object
  * - overloaded: this is the default with no parameters, and should not be used
@@ -55,6 +72,22 @@ Array::Array(Parser *in)
         printf("NOTE: bad value for δ, continuing with δ = 1\n");
         delta = 1;
     }
+
+    // build all Singles, associated with an array of Factors
+    factors = new Factor*[num_factors];
+    for (int i = 0; i < num_factors; i++) {
+        factors[i] = new Factor(i, in->levels.at(i), new Single*[in->levels.at(i)]);
+        for (int j = 0; j < factors[i]->level; j++)
+            factors[i]->singles[j] = new Single(i, j);
+    }
+    for (int row = 0; row < in->num_rows; row++)
+        for (int col = 0; col < in->num_cols; col++)
+            factors[col]->singles[in->array.at(row)[col]]->rows.insert(row + 1);
+    if (v == v_on) print_singles(factors, num_factors);
+
+    // build all Interactions
+    // TODO
+
     //factors = new Factor[num_factors];
     /*
     for (int row = 0; row < num_tests; row++) {
@@ -97,6 +130,11 @@ Array::Array(Parser *in)
     factors[num_factors-1].interactions_size = 0;
     factors[num_factors-1].interactions = nullptr;
     */
+}
+
+void Array::build_t_way_interactions(int i, int t, std::vector<Single*> interaction_so_far)
+{
+
 }
 
 /* SUB METHOD: is_covering - performs the analysis for coverage
@@ -206,7 +244,8 @@ bool Array::is_detecting(bool report)
 */
 Array::~Array()
 {
-    //delete[] factors;
+    for (int i = 0; i < num_factors; i++) delete factors[i];
+    delete[] factors;
 }
 
 
