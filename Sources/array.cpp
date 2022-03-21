@@ -22,11 +22,66 @@ Last updated 03/20/2022
 #include <unistd.h>
 
 // method forward declarations
-static void print_failure(int f1, int v1, int f2, int v2);
+static void print_failure(Interaction *interaction);
 static void print_failure(int i1f1, int i1v1, int i1f2, int i1v2, std::set<int> *rows,
     int i2f1, int i2v1, int i2f2, int i2v2);
 static void print_singles(Factor **factors, int num_factors);
 static void print_interactions(std::vector<Interaction*> interactions);
+static void print_sets(std::set<T*> sets);
+
+/* CONSTRUCTOR - initializes the object
+ * - overloaded: this is the default with no parameters, and should not be used
+*/
+Interaction::Interaction()
+{
+    // nothing to do
+}
+
+/* CONSTRUCTOR - initializes the object
+ * - overloaded: this version can set its fields based on a premade vector of Single pointers
+*/
+Interaction::Interaction(std::vector<Single*> *temp)
+{
+    // fencepost start: let the Interaction be the strength 1 interaction involving just the 0th Single in temp
+    singles.push_back(temp->at(0));
+    rows = temp->at(0)->rows;
+
+    // fencepost loop: for any t > 1, rows of the Interaction is the intersection of each Single's rows
+    for (int i = 1; i < temp->size(); i++) {
+      singles.push_back(temp->at(i));
+      std::set<int> temp_set;
+      std::set_intersection(rows.begin(), rows.end(),
+        temp->at(i)->rows.begin(), temp->at(i)->rows.end(), std::inserter(temp_set, temp_set.begin()));
+      rows = temp_set;
+    }
+}
+
+/* CONSTRUCTOR - initializes the object
+ * - overloaded: this is the default with no parameters, and should not be used
+*/
+T::T()
+{
+    // nothing to do
+}
+
+/* CONSTRUCTOR - initializes the object
+ * - overloaded: this version can set its fields based on a premade vector of Interaction pointers
+*/
+T::T(std::vector<Interaction*> *temp)
+{
+    // fencepost start: let the Interaction be the strength 1 interaction involving just the 0th Single in s
+    interactions.push_back(temp->at(0));
+    rows = temp->at(0)->rows;
+
+    // fencepost loop: for any t > 1, rows of the Interaction is the intersection of each Single's rows
+    for (int i = 1; i < temp->size(); i++) {
+      interactions.push_back(temp->at(i));
+      std::set<int> temp_set;
+      std::set_union(rows.begin(), rows.end(),
+        temp->at(i)->rows.begin(), temp->at(i)->rows.end(), std::inserter(temp_set, temp_set.begin()));
+      rows = temp_set;
+    }
+}
 
 /* CONSTRUCTOR - initializes the object
  * - overloaded: this is the default with no parameters, and should not be used
@@ -40,7 +95,7 @@ Array::Array()
 }
 
 /* CONSTRUCTOR - initializes the object
- * - overloaded: this version can set its fields based on a Parser object
+ * - overloaded: this version can set its fields based on a pointer to a Parser object
 */
 Array::Array(Parser *in)
 {
@@ -75,59 +130,36 @@ Array::Array(Parser *in)
     if (v == v_on) print_singles(factors, num_factors);
 
     // build all Interactions
-    std::vector<Single*> temp;
-    build_t_way_interactions(0, t, &temp);
+    std::vector<Single*> temp_singles;
+    build_t_way_interactions(0, t, &temp_singles);
     if (v == v_on) print_interactions(interactions);
 
-    //factors = new Factor[num_factors];
-    /*
-    for (int row = 0; row < num_tests; row++) {
-        rows.push_back(Row());
-    }
-
-    Interaction *pairs;
-    Interaction *interaction;
-    int idx;    // used to properly iterate over the array of interactions for a given element of factors[]
-    for (int i = 0; i < num_factors - 1; i++) { // for every factor (column) but the last
-        factors[i].id = i;
-        factors[i].level = in->levels.at(i);
-        factors[i].interactions_size = num_factors-i-1;
-        factors[i].interactions = new Interaction*[num_factors-i-1];
-        idx = 0;
-        for (int j = i + 1; j < num_factors; j++) { // for every following factor (all columns to the right)
-            pairs = new Interaction[in->levels.at(i)*in->levels.at(j)];
-            for (int this_level = 0; this_level < in->levels.at(i); this_level++) {  // for all possible values of this factor
-                for (int other_level = 0; other_level < in->levels.at(j); other_level++) {   // for all possible values of the other factor
-                    interaction = &pairs[this_level*in->levels.at(j)+other_level];
-                    interaction->this_factor = &factors[i];
-                    interaction->other_factor = &factors[j];
-                    interaction->this_val = this_level;
-                    interaction->other_val = other_level;
-                    interaction->is_locating = true;
-                    for (int row = 0; row < num_tests; row++) {   // go find rows where this interaction occurs
-                        if (in->array.at(row)[i] == this_level && in->array.at(row)[j] == other_level) {
-                            interaction->occurrences.insert(row);  // to track the rows in which this interaction occurs
-                            rows.at(row).interactions.push_back(interaction);   // to track the interactions in a given row
-                        }
-                    }
-                }
-            }
-            factors[i].interactions[idx++] = pairs;
-        }
-    }
-    // the final column is a fencepost case; it differs from the rest in not needing to track interactions
-    factors[num_factors-1].id = num_factors-1;
-    factors[num_factors-1].level = in->levels.at(num_factors-1);
-    factors[num_factors-1].interactions_size = 0;
-    factors[num_factors-1].interactions = nullptr;
-    */
+    // build all Ts
+    if (p == c_only) return;    // no need to spend effort building Ts if they won't be used
+    std::vector<Interaction*> temp_interactions;
+    build_size_d_sets(0, d, &temp_interactions);
+    if (v == v_on) print_sets(sets);
 }
 
-void Array::build_t_way_interactions(int start, int t, std::vector<Single*> *interaction_so_far)
+/* HELPER METHOD: build_t_way_interactions - initializes the interactions vector recursively
+ * - the factors array must be initialized before calling this method
+ * - top down recursive; auxilary caller should use 0, t, and an empty vector as initial parameters
+ *   --> do not use the interactions vector itself as the parameter
+ * - this method should not be called more than once
+ * 
+ * parameters:
+ * - start: left side of factors array at which to begin the outer for loop
+ * - t: desired strength of interactions
+ * - singles_so_far: auxilary vector of pointers used to track the current combination of Singles
+ * 
+ * returns:
+ * - void, but after the method finishes, the Array's interactions vector will be initialized
+*/
+void Array::build_t_way_interactions(int start, int t, std::vector<Single*> *singles_so_far)
 {
     // base case: interaction is completed and ready to store
     if (t == 0) {
-        Interaction *new_interaction = new Interaction(interaction_so_far);
+        Interaction *new_interaction = new Interaction(singles_so_far);
         interactions.push_back(new_interaction);
         return;
     }
@@ -135,42 +167,63 @@ void Array::build_t_way_interactions(int start, int t, std::vector<Single*> *int
     // recursive case: need to introduce another loop for higher strength
     for (int col = start; col < num_factors - t + 1; col++) {
         for (int level = 0; level < factors[col]->level; level++) {
-            interaction_so_far->push_back(factors[col]->singles[level]);  // note these are Single *
-            build_t_way_interactions(col+1, t-1, interaction_so_far);
-            interaction_so_far->pop_back();
+            singles_so_far->push_back(factors[col]->singles[level]);    // note these are Single *
+            build_t_way_interactions(col+1, t-1, singles_so_far);
+            singles_so_far->pop_back();
         }
+    }
+}
+
+/* HELPER METHOD: build_size_d_sets - initializes the sets set recursively (a set of sets of interactions)
+ * - the interactions vector must be initialized before calling this method
+ * - top down recursive; auxilary caller should use 0, d, and an empty set as initial parameters
+ *   --> do not use the sets set itself as the parameter
+ * - this method should not be called more than once
+ * 
+ * parameters:
+ * - start: left side of interactions vector at which to begin the for loop
+ * - d: desired magnitude of sets
+ * - interactions_so_far: auxilary vector of pointers used to track the current combination of Interactions
+ * 
+ * returns:
+ * - void, but after the method finishes, the Array's sets set will be initialized
+*/
+void Array::build_size_d_sets(int start, int d, std::vector<Interaction*> *interactions_so_far)
+{
+    // base case: set is completed and ready to store
+    if (d == 0) {
+        T *new_set = new T(interactions_so_far);
+        sets.insert(new_set);
+        return;
+    }
+
+    // recursive case: need to introduce another loop for higher magnitude
+    for (int i = start; i < interactions.size() - d + 1; i++) {
+        interactions_so_far->push_back(interactions[i]);    // note these are Interaction *
+        build_size_d_sets(i+1, d-1, interactions_so_far);
+        interactions_so_far->pop_back();
     }
 }
 
 /* SUB METHOD: is_covering - performs the analysis for coverage
  * 
  * parameters:
- * - none
+ * - report: when true, output is based on flags, else there will be no output whatsoever
  * 
  * returns:
- * - true if the array has strength 2, false if not
+ * - true if the array has t-way coverage, false if not
 */
 bool Array::is_covering(bool report)
 {
     if (report && o != silent) printf("Checking coverage....\n\n");
     bool passed = true;
-    /* TODO: fix this
-    int idx;
-    for (int i = 0; i < num_factors - 1; i++) { // for every factor (column) but the last
-        idx = 0;
-        for (int j = i + 1; j < num_factors; j++) { // for every following factor (all columns to the right)
-            for (int this_level = 0; this_level < factors[i].level; this_level++) {  // for all possible values of this factor
-                for (int other_level = 0; other_level < factors[j].level; other_level++) {   // for all possible values of the other factor
-                    if (factors[i].interactions[idx][this_level*other_level+other_level].occurrences.size() == 0) {    // if the interaction was not present
-                        print_failure(i, this_level, j, other_level);
-                        passed = false;
-                    }
-                }
-            }
-            idx++;
+    for (Interaction *i : interactions) {
+        if (i->rows.size() == 0) {  // coverage issue
+            if (o != normal) return false;  // if not reporting failures, can reduce work
+            print_failure(i);
+            passed = false;
         }
     }
-    */
     if (report && o != silent) printf("COVERAGE CHECK: %s\n\n", passed ? "PASSED" : "FAILED");
     return passed;
 }
@@ -178,10 +231,10 @@ bool Array::is_covering(bool report)
 /* SUB METHOD: is_locating - performs the analysis for location
  * 
  * parameters:
- * - none
+ * - report: when true, output is based on flags, else there will be no output whatsoever
  * 
  * returns:
- * - true if the array has location, false if not
+ * - true if the array has (d-t)-location, false if not
 */
 bool Array::is_locating(bool report)
 {
@@ -232,10 +285,10 @@ bool Array::is_locating(bool report)
 /* SUB METHOD: is_detecting - performs the analysis for location
  * 
  * parameters:
- * - none
+ * - report: when true, output is based on flags, else there will be no output whatsoever
  * 
  * returns:
- * - true if the array has location, false if not
+ * - true if the array has (d, t, δ)-detection, false if not
 */
 bool Array::is_detecting(bool report)
 {
@@ -252,16 +305,22 @@ Array::~Array()
     for (int i = 0; i < num_factors; i++) delete factors[i];
     delete[] factors;
     for (Interaction *i : interactions) delete i;
+    for (T *s : sets) delete s;
 }
 
 
 
 // ==============================   LOCAL HELPER METHODS BELOW THIS POINT   ============================== //
 
-static void print_failure(int f1, int v1, int f2, int v2)
+static void print_failure(Interaction *interaction)
 {
-    printf("\t-- INTERACTION NOT FOUND --\n");
-    printf("\t(f%d, %d) and (f%d, %d)\n\n", f1, v1, f2, v2);
+    printf("\t-- %d-WAY INTERACTION NOT PRESENT --\n", interaction->singles.size());
+    std::string output("\t{");
+    for (Single *s : interaction->singles)
+        output += "(f" + std::to_string(s->factor) + ", " + std::to_string(s->value) + "), ";
+    output = output.substr(0, output.size() - 2) + "}\n";
+    std::cout << output << std::endl;
+    //printf("\t(f%d, %d) and (f%d, %d)\n\n", f1, v1, f2, v2);
 }
 
 static void print_failure(int i1f1, int i1v1, int i1f2, int i1v2, std::set<int> *rows,
@@ -279,7 +338,7 @@ static void print_failure(int i1f1, int i1v1, int i1f2, int i1v2, std::set<int> 
 static void print_singles(Factor **factors, int num_factors)
 {
     int pid = getpid();
-    printf("==%d== Listing all Singles below:\n\n", pid);
+    printf("\n==%d== Listing all Singles below:\n\n", pid);
     for (int col = 0; col < num_factors; col++) {
         printf("Factor %d:\n", factors[col]->id);
         for (int level = 0; level < factors[col]->level; level++) {
@@ -294,13 +353,28 @@ static void print_singles(Factor **factors, int num_factors)
 static void print_interactions(std::vector<Interaction*> interactions)
 {
     int pid = getpid();
-    printf("==%d== Listing all Interactions below:\n\n", pid);
+    printf("\n==%d== Listing all Interactions below:\n\n", pid);
     int i = 0;
     for (Interaction *interaction : interactions) {
-        printf("%d:\nints: {", ++i);
+        interaction->id = ++i;
+        printf("Interaction %d:\n\tInt: {", i);
         for (Single *s : interaction->singles) printf(" (f%d, %d)", s->factor, s->value);
-        printf(" }\nrows: {");
+        printf(" }\n\tRows: {");
         for (int row : interaction->rows) printf(" %d", row);
+        printf(" }\n\n");
+    }
+}
+
+static void print_sets(std::set<T*> sets)
+{
+    int pid = getpid();
+    printf("\n==%d== Listing all Ts below:\n\n", pid);
+    int i = 0;
+    for (T *s : sets) {
+        printf("Set %d:\n\tSet: {", ++i);
+        for (Interaction *interaction : s->interactions) printf(" %d", interaction->id);
+        printf(" }\n\tRows: {");
+        for (int row : s->rows) printf(" %d", row);
         printf(" }\n\n");
     }
 }

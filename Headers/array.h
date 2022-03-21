@@ -15,6 +15,20 @@ Last updated 03/20/2022
 #include "parser.h"
 #include "factor.h"
 
+class Interaction
+{
+    public:
+        int id; // used only in verbose mode, to have some id associated with the interaction
+        //int strength;   // the interaction strength t is the number of (factor, value) tuples involved
+        std::vector<Single*> singles;   // the actual list of (factor, value) tuples
+
+        // this tracks the set of tests (represented as row numbers) in which this interaction occurs;
+        std::set<int> rows; // this row coverage is vital to analyzing the locating and detecting properties
+
+        Interaction();   // default constructor, don't use this
+        Interaction(std::vector<Single*> *temp);   // constructor with a premade vector of Single pointers
+};
+
 // I wasn't sure what to name this, except after the formal parameter used in Dr. Colbourn's definitions
 // Note that Colbourn's definitions use a script T: 𝒯 
 // This class is used to more easily compare the row coverage of different size-d sets of t-way interactions
@@ -31,6 +45,9 @@ class T
                             // once; it can be checked to cut down on computation time when false
         
         bool is_detecting;  // same as above
+
+        T();    // default constructor, don't use this
+        T(std::vector<Interaction*> *temp);    // constructor with a premade vector of Interaction pointers
 };
 
 class Array
@@ -51,7 +68,7 @@ class Array
         bool is_detecting(bool report = true);
 
         Array();    // default constructor, don't use this
-        Array(Parser *in);  // constructor that takes an initialized Parser object
+        Array(Parser *in);  // constructor with an initialized Parser object
         ~Array();   // deconstructor
 
     private:
@@ -69,9 +86,9 @@ class Array
 
         // this utility method is called in the constructor to fill out the vector of all interactions
         // almost certainly needs to be recursive in order to handle arbitrary values of t
-        void build_t_way_interactions(int start, int t, std::vector<Single*> *interaction_so_far);
+        void build_t_way_interactions(int start, int t, std::vector<Single*> *singles_so_far);
 
         // after the above method completes, call this one to fill out the set of all size-d sets
         // almost certainly needs to be recursive in order to handle arbitrary values of d
-        void build_size_d_Ts(int start, int d, std::set<Interaction*> *set_so_far);
+        void build_size_d_sets(int start, int d, std::vector<Interaction*> *interactions_so_far);
 };
