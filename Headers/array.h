@@ -1,5 +1,5 @@
 /* LA-Checker by Isaac Jung
-Last updated 03/20/2022
+Last updated 03/21/2022
 
 |===========================================================================================================|
 |   This header contains classes for managing the array in an automated fashion. The Row class is just a    |
@@ -20,7 +20,7 @@ class Interaction
     public:
         int id; // used only in verbose mode, to have some id associated with the interaction
         //int strength;   // the interaction strength t is the number of (factor, value) tuples involved
-        std::vector<Single*> singles;   // the actual list of (factor, value) tuples
+        std::set<Single*> singles;   // the actual list of (factor, value) tuples
 
         // this tracks the set of tests (represented as row numbers) in which this interaction occurs;
         std::set<int> rows; // this row coverage is vital to analyzing the locating and detecting properties
@@ -35,7 +35,7 @@ class Interaction
 class T
 {
     public:
-        std::vector<Interaction*> interactions; // for easier access to the interactions themselves
+        std::set<Interaction*> interactions; // for easier access to the interactions themselves
 
         // each interaction in a given T set has its own version of this; the ρ associated with a T is simply
         std::set<int> rows;  // the union of the ρ's for each interaction in that T
@@ -81,8 +81,8 @@ class Array
         int num_tests;      // just a field to reference the upper bound on iterating through rows
         int num_factors;    // just a field to reference the upper bound on iterating through columns
         Factor **factors;    // pointer to the start of an array of pointers to Factor objects
-        std::set<T*> sets;  // a set of all size-d sets of t-way interactions constructable from the array
-        std::vector<Interaction*> interactions; // list of all individual interactions
+        std::vector<Interaction*> interactions; // list of all individual t-way interactions
+        std::vector<T*> sets;  // list of all size-d sets of t-way interactions
 
         // this utility method is called in the constructor to fill out the vector of all interactions
         // almost certainly needs to be recursive in order to handle arbitrary values of t

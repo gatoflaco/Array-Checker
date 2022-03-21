@@ -1,4 +1,4 @@
-# EDIT 03/20/2022: REFACTORING STILL IN PROGRESS, CODE WILL COMPILE BUT NOT FUNCTION CORRECTLY
+# EDIT 03/21/2022: JUST FINISHED REFACTORING, TESTING NEEDED
 
 # Array-Checker
 ### Author: Isaac Jung
@@ -112,15 +112,15 @@ CONCLUSIONS:
 -- DISTINCT SETS WITH EQUAL ROWS --
 Set 1: { {(f0, 1), (f3, 0)}; {(f0, 1), (f3, 1)} }
 Set 2: { {(f1, 1), (f3, 0)}; {(f1, 1), (f3, 1)} }
-rows: { 9, 10 }
+Rows: { 9, 10 }
 ```
   - This shows two sets of user-specified magnitude d = 2, each consisting of two 2-way interactions. The interpretation of this output is that the rows in which the first set of interactions occurs is equal to the rows in which the second set of interaction occurs, specifically rows 9 and 10. For more information on why this is an issue, refer to the [details and definitions](#details-and-definitions) section.
 3. `detection_issue`:
 ```
 -- ROW DIFFERENCE LESS THAN 2 --
-Interaction: {(f0, 0), (f3, 2)}, { 2, 4 }
+Int: {(f0, 0), (f3, 2)}, { 2, 4 }
 Set: { {(f0, 0), (f2, 1)} }, { 3, 4, 5 }
-Difference: { 2 }
+Dif: { 2 }
 ```
   - This would be during a check for (1, 2)-detection with a desired separation of δ = 2. The output shows that the set of rows in which the interaction occurs, {2, 4}, has only 1 element unique from those in which the given set occurs, {3, 4, 5}. That row, {2}, is reported, more than anything to show that the magnitude of the set difference is indeed less than δ. Again, refer to the [details and definitions](#details-and-definitions) section for a better understanding of where this is coming from.
 
@@ -177,7 +177,7 @@ The actual implementation of this program is simple in terms of flow. The progra
   Next, the Array constructor checks if location or detection were requested (via the Parser object's fields). If so, it also must build all possible size-d sets of the t-way interactions. Note that the name of this class is simply T. Building all possible Ts requires a method very similar to building all possible Interactions. It is slightly simpler due to the linear nature of the vector containing all Interaction pointers. As size-d sets are created, they are inserted into a set; conceptually, the order does not matter. At the end of this step, the Array object has enough information to compute location and detection. If neither was requested, this entire phase is skipped, saving computation time.
   For checking t-coverage, the is_covering() method is called by the main program. The method iterates through all Interactions and simply ensures that the magnitude of the set of rows associated with each Interaction is at least t. If it is not, the issue is logged for the user to see which Interaction does not appear enough times (the program could detect a coverage issue earlier if a Single itself did not have an adequate-size set of rows, but the design decision was made to not check for that). As soon as a single issue is discovered, the Array by definition lacks t-coverage. Therefore, when certain flags are set to avoid extra work, this method will immediately return false in this situation. Otherwise, it will simply set a boolean and continue reporting any other issues it finds, waiting to return false till the end. If all Interactions satisfy t-coverage, the method returns true.
   For checking (d, t)-location, the is_locating() method is called by the main program. The method considers all pairs of Ts and ensures that no two Ts share the same set of rows in which they occur. If any two distinct Ts have the same set of rows, it is reported as an issue to the user. Just like with the coverage check, a single issue means the entire method should return false, and setting certain flags can make the method return false upon encountering any issue at all. Otherwise, the method reports all issues discovered. If all pairs of distinct Ts satisfy (d, t)-location, the method returns true.
-  For check (d, t, δ)-detection, the is_detecting() method is called by the main program. The method iterates over all Interactions, and for each Interaction, it iterates over all Ts. Then, for a given (Interaction, T) pair, the method ensures that either (a) the Interaction is a member of T, or (b) the set difference between the Interaction's rows and the T's rows is at least δ in magnitude. If the separation between a given Interaction and T is less than δ, the user is informed of the issue, and as with the previous methods, a boolean is set to false. Also like the previous methods, it is possible to immediately return false upon discovering a single issue, when certain flags are set. If the method finishes iterating and finds no (d, t, δ)-detection issues, the method returns true.
+  For checking (d, t, δ)-detection, the is_detecting() method is called by the main program. The method iterates over all Interactions, and for each Interaction, it iterates over all Ts. Then, for a given (Interaction, T) pair, the method ensures that either (a) the Interaction is a member of T, or (b) the set difference between the Interaction's rows and the T's rows is at least δ in magnitude. If the separation between a given Interaction and T is less than δ, the user is informed of the issue, and as with the previous methods, a boolean is set to false. Also like the previous methods, it is possible to immediately return false upon discovering a single issue, when certain flags are set. If the method finishes iterating and finds no (d, t, δ)-detection issues, the method returns true.
   During a check for detection, the Array also updates a `true_delta` field, defined simply as the minumum separation between all (Interaction, T) pairs. This is useful for letting the user know that there may be an even higher separation than they intended (not necessarily a bad thing).
 
 Below is a non-comprehensive list of fundamental key words and concepts, ordered alphabetically. When a **bolded** term is used in a definition, that term can be found defined elsewhere in the list. The definitions and exlpanations here are not worded with formal mathematical notation, but rather with relatively plain English descriptions. For precise definitions and the full context of the problem, check out the [paper linked further down](#additional-links).

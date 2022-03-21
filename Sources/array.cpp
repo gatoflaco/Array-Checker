@@ -1,5 +1,5 @@
 /* LA-Checker by Isaac Jung
-Last updated 03/20/2022
+Last updated 03/21/2022
 
 |===========================================================================================================|
 |   This file containes the meat of this project's logic. The constructor for the Array class has a pointer |
@@ -23,11 +23,11 @@ Last updated 03/20/2022
 
 // method forward declarations
 static void print_failure(Interaction *interaction);
-static void print_failure(int i1f1, int i1v1, int i1f2, int i1v2, std::set<int> *rows,
-    int i2f1, int i2v1, int i2f2, int i2v2);
+static void print_failure(T *s1, T *s2);
+static void print_failure(Interaction *interaction, T *s, int delta, std::set<int> *dif);
 static void print_singles(Factor **factors, int num_factors);
 static void print_interactions(std::vector<Interaction*> interactions);
-static void print_sets(std::set<T*> sets);
+static void print_sets(std::vector<T*> sets);
 
 /* CONSTRUCTOR - initializes the object
  * - overloaded: this is the default with no parameters, and should not be used
@@ -43,12 +43,12 @@ Interaction::Interaction()
 Interaction::Interaction(std::vector<Single*> *temp)
 {
     // fencepost start: let the Interaction be the strength 1 interaction involving just the 0th Single in temp
-    singles.push_back(temp->at(0));
+    singles.insert(temp->at(0));
     rows = temp->at(0)->rows;
 
     // fencepost loop: for any t > 1, rows of the Interaction is the intersection of each Single's rows
     for (int i = 1; i < temp->size(); i++) {
-      singles.push_back(temp->at(i));
+      singles.insert(temp->at(i));
       std::set<int> temp_set;
       std::set_intersection(rows.begin(), rows.end(),
         temp->at(i)->rows.begin(), temp->at(i)->rows.end(), std::inserter(temp_set, temp_set.begin()));
@@ -70,12 +70,12 @@ T::T()
 T::T(std::vector<Interaction*> *temp)
 {
     // fencepost start: let the Interaction be the strength 1 interaction involving just the 0th Single in s
-    interactions.push_back(temp->at(0));
+    interactions.insert(temp->at(0));
     rows = temp->at(0)->rows;
 
     // fencepost loop: for any t > 1, rows of the Interaction is the intersection of each Single's rows
     for (int i = 1; i < temp->size(); i++) {
-      interactions.push_back(temp->at(i));
+      interactions.insert(temp->at(i));
       std::set<int> temp_set;
       std::set_union(rows.begin(), rows.end(),
         temp->at(i)->rows.begin(), temp->at(i)->rows.end(), std::inserter(temp_set, temp_set.begin()));
@@ -193,7 +193,7 @@ void Array::build_size_d_sets(int start, int d, std::vector<Interaction*> *inter
     // base case: set is completed and ready to store
     if (d == 0) {
         T *new_set = new T(interactions_so_far);
-        sets.insert(new_set);
+        sets.push_back(new_set);
         return;
     }
 
@@ -229,6 +229,7 @@ bool Array::is_covering(bool report)
 }
 
 /* SUB METHOD: is_locating - performs the analysis for location
+ * - assumes the is_locating() method has already been called and returned true
  * 
  * parameters:
  * - report: when true, output is based on flags, else there will be no output whatsoever
@@ -240,44 +241,15 @@ bool Array::is_locating(bool report)
 {
     if (report && o != silent) printf("Checking location....\n\n");
     bool passed = true;
-    /* TODO: fix this
-    int num_interactions = num_factors*(num_factors-1)/2;
-    std::set<int> *occurrences1, *occurrences2;
-    
-    for (Row test : rows) { // for every row (test) in the array
-        for (int i1 = 0; i1 < num_interactions - 1; i1++) { // for every interaction in the row but the last
-            for (int i2 = i1 + 1; i2 < num_interactions; i2++) {    // for every following interaction
-                occurrences1 = &test.interactions.at(i1)->occurrences;    // the set of all rows in which interaction 1 occurs
-                occurrences2 = &test.interactions.at(i2)->occurrences;    // the set of all rows in which interaction 2 occurs
-
-                // see if i1's rows are a subset of i2's; if so, i1 is wiped out by i2 and cannot be located
-                if (*occurrences1 == *occurrences2) {
-                    if (!test.interactions.at(i1)->is_locating) continue;   // may want to comment this line
-                    print_failure( test.interactions.at(i1)->this_factor->id, test.interactions.at(i1)->this_val,
-                        test.interactions.at(i1)->other_factor->id, test.interactions.at(i1)->other_val, occurrences1,
-                        test.interactions.at(i2)->this_factor->id, test.interactions.at(i2)->this_val,
-                        test.interactions.at(i2)->other_factor->id, test.interactions.at(i2)->other_val);
-                    test.interactions.at(i1)->is_locating = false;
-                    passed = false;
-                }
-
-                // see if i2's rows are a subset of i1's (they could even be subsets of each other; equal)
-                /*if (std::includes(occurrences1->begin(), occurrences1->end(), occurrences2->begin(), occurrences2->end())) {
-                    if (!test.interactions.at(i2)->is_locating) continue;
-                    print_failure(
-                        test.interactions.at(i2)->this_factor->id, test.interactions.at(i2)->this_val,
-                        test.interactions.at(i2)->other_factor->id, test.interactions.at(i2)->other_val,
-                        occurrences2,
-                        test.interactions.at(i1)->this_factor->id, test.interactions.at(i1)->this_val,
-                        test.interactions.at(i1)->other_factor->id, test.interactions.at(i1)->other_val,
-                        occurrences1);
-                    test.interactions.at(i2)->is_locating = false;
-                    passed = false;
-                }//
+    for (int i = 0; i < sets.size() - 1; i++) {
+        for (int j = i + 1; j < sets.size(); j++) {
+            if (sets.at(i)->rows == sets.at(j)->rows) { // location issue
+                if (o != normal) return false;  // if not reporting failures, can reduce work
+                print_failure(sets.at(i), sets.at(j));
+                passed = false;
             }
         }
     }
-    */
     if (report && o != silent) printf("LOCATION CHECK: %s\n\n", passed ? "PASSED" : "FAILED");
     return passed;
 }
@@ -294,6 +266,20 @@ bool Array::is_detecting(bool report)
 {
     if (report && o != silent) printf("Checking detection....\n\n");
     bool passed = true;
+    for (Interaction *i : interactions) {
+        for (T *s : sets) {
+            if (s->interactions.find(i) != s->interactions.end()) continue; // interaction is in the set
+            std::set<int> dif;
+            std::set_difference(i->rows.begin(), i->rows.end(), s->rows.begin(), s->rows.end(),
+                std::inserter(dif, dif.begin()));
+            if (dif.size() < delta) {   // and if the set difference is less than δ
+                if (o != normal) return false;  // if not reporting failures, can reduce work
+                print_failure(i, s, delta, &dif);
+                passed = false;
+            }
+            else if (dif.size() < true_delta) true_delta = dif.size();
+        }
+    }
     if (report && o != silent) printf("DETECTION CHECK: %s\n\n", passed ? "PASSED" : "FAILED");
     return passed;
 }
@@ -320,19 +306,50 @@ static void print_failure(Interaction *interaction)
         output += "(f" + std::to_string(s->factor) + ", " + std::to_string(s->value) + "), ";
     output = output.substr(0, output.size() - 2) + "}\n";
     std::cout << output << std::endl;
-    //printf("\t(f%d, %d) and (f%d, %d)\n\n", f1, v1, f2, v2);
 }
 
-static void print_failure(int i1f1, int i1v1, int i1f2, int i1v2, std::set<int> *rows,
-    int i2f1, int i2v1, int i2f2, int i2v2)
+static void print_failure(T *s1, T *s2)
 {
-    printf("\t-- INTERACTIONS NOT LOCATING --\n");
-    printf("\tInteraction 1: (f%d, %d) and (f%d, %d)\n", i1f1, i1v1, i1f2, i1v2);
-    printf("\tInteraction 2: (f%d, %d) and (f%d, %d)\n", i2f1, i2v1, i2f2, i2v2);
-    printf("\trows: { ");
-    std::string str = "";
-    for (int row : *rows) str += std::to_string(row + 1) + ", ";
-    printf("%s }\n\n", str.substr(0, str.size() - 2).c_str());
+    printf("\t-- DISTINCT SETS WITH EQUAL ROWS --\n");
+    std::string output("\tSet 1: { {");
+    for (Interaction *i : s1->interactions) {
+        for (Single *s : i->singles)
+            output += "(f" + std::to_string(s->factor) + ", " + std::to_string(s->value) + "), ";
+        output = output.substr(0, output.size() - 2) + "}; ";
+    }
+    output = output.substr(0, output.size() - 2) + " }\n\tSet 2: { {";
+    for (Interaction *i : s2->interactions) {
+        for (Single *s : i->singles)
+            output += "(f" + std::to_string(s->factor) + ", " + std::to_string(s->value) + "), ";
+        output = output.substr(0, output.size() - 2) + "}; ";
+    }
+    output = output.substr(0, output.size() - 2) + " }\n\tRows: { ";
+    for (int row : s1->rows) output += std::to_string(row) + ", ";
+    output = output.substr(0, output.size() - 2) + " }\n";
+    std::cout << output << std::endl;
+}
+
+static void print_failure(Interaction *interaction, T *s, int delta, std::set<int> *dif)
+{
+    printf("\t-- ROW DIFFERENCE LESS THAN %d --\n", delta);
+    std::string output("\tInt: {");
+    for (Single *s : interaction->singles)
+        output += "(f" + std::to_string(s->factor) + ", " + std::to_string(s->value) + "), ";
+    output = output.substr(0, output.size() - 2) + "}, { ";
+    for (int row : interaction->rows) output += std::to_string(row) + ", ";
+    output = output.substr(0, output.size() - 2) + " }\n\tSet: { {";
+    for (Interaction *i : s->interactions) {
+        for (Single *s : i->singles)
+            output += "(f" + std::to_string(s->factor) + ", " + std::to_string(s->value) + "), ";
+        output = output.substr(0, output.size() - 2) + "}; ";
+    }
+    output = output.substr(0, output.size() - 2) + "}, { ";
+    for (int row : s->rows) output += std::to_string(row) + ", ";
+    output = output.substr(0, output.size() - 2) + " }\n\tDif: { ";
+    for (int row : *dif) output += std::to_string(row) + ", ";
+    if (dif->size() > 0) output = output.substr(0, output.size() - 2) + " }\n";
+    else output += "}\n";
+    std::cout << output << std::endl;
 }
 
 static void print_singles(Factor **factors, int num_factors)
@@ -365,7 +382,7 @@ static void print_interactions(std::vector<Interaction*> interactions)
     }
 }
 
-static void print_sets(std::set<T*> sets)
+static void print_sets(std::vector<T*> sets)
 {
     int pid = getpid();
     printf("\n==%d== Listing all Ts below:\n\n", pid);

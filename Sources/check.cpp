@@ -1,5 +1,5 @@
 /* LA-Checker by Isaac Jung
-Last updated 03/19/2022
+Last updated 03/20/2022
 
 |===========================================================================================================|
 |   This file contains the main() method which reflects the high level flow of the program. It starts by    |
