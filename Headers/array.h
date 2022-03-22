@@ -53,7 +53,7 @@ class T
 class Array
 {
     public:
-        int true_delta; // the true maximum separation is tracked and updated during a detection check
+        long unsigned int true_delta; // the true maximum separation is updated during a detection check
 
         // checks whether the array is covering; this means that every interaction of strength t occurs in
         // the array at least 1 time (TODO: extend this to at least δ times for (t, δ)-coverage)
@@ -72,23 +72,25 @@ class Array
         ~Array();   // deconstructor
 
     private:
-        int d;  // this is the size of the sets of t-way interactions; the sets are what need to be compared
-        int t;  // this is the strength of interest; see README for details on the strength of an interaction
-        int delta;  // this is the desired separation of the array; it affects the is_detecting() method
-        verb_mode v;    // unused at the moment
+        long unsigned int d;        // this is the size of the sets of t-way interactions
+        long unsigned int t;        // this is the strength of interest
+        long unsigned int delta;    // this is the desired separation of the array
+        verb_mode v;    // this makes the program print out the data structures when enabled
         out_mode o;     // this dictates how much output should be printed; see parser.h for typedef
         prop_mode p;    // this is used to avoid building sets if it won't be needed anyway
-        int num_tests;      // just a field to reference the upper bound on iterating through rows
-        int num_factors;    // just a field to reference the upper bound on iterating through columns
+        long unsigned int num_tests;    // field to reference the upper bound on iterating through rows
+        long unsigned int num_factors;  // field to reference the upper bound on iterating through columns
         Factor **factors;    // pointer to the start of an array of pointers to Factor objects
         std::vector<Interaction*> interactions; // list of all individual t-way interactions
         std::vector<T*> sets;  // list of all size-d sets of t-way interactions
 
         // this utility method is called in the constructor to fill out the vector of all interactions
         // almost certainly needs to be recursive in order to handle arbitrary values of t
-        void build_t_way_interactions(int start, int t, std::vector<Single*> *singles_so_far);
+        void build_t_way_interactions(long unsigned int start, long unsigned int t_cur,
+            std::vector<Single*> *singles_so_far);
 
         // after the above method completes, call this one to fill out the set of all size-d sets
         // almost certainly needs to be recursive in order to handle arbitrary values of d
-        void build_size_d_sets(int start, int d, std::vector<Interaction*> *interactions_so_far);
+        void build_size_d_sets(long unsigned int start, long unsigned int d_cur,
+            std::vector<Interaction*> *interactions_so_far);
 };

@@ -1,5 +1,5 @@
 /* LA-Checker by Isaac Jung
-Last updated 03/13/2022
+Last updated 03/21/2022
 
 |===========================================================================================================|
 |   This header contains a class used for processing input. Should the input format change, this class can  |
@@ -60,9 +60,9 @@ class Parser
 {
     public:
         // arguments
-        int d;  // magnitude of 𝒯 sets of t-way interactions
-        int t;  // strength of interactions
-        int delta;  // desired separation
+        long unsigned int d;  // magnitude of 𝒯 sets of t-way interactions
+        long unsigned int t;  // strength of interactions
+        long unsigned int delta;  // desired separation
 
         // flags
         verb_mode v;    // verbose mode, v_off by default
@@ -70,11 +70,11 @@ class Parser
         prop_mode p;    // properties mode, all by default
 
         // array stuff
-        int num_rows = 0;           // rows, or tests, in the array
-        int num_cols = 0;           // columns, or factors, in the array
-        std::vector<int> levels;    // levels associated with each factor
-        std::vector<int*> array;    // the array itself
-        int process_input();        // call this to process standard in
+        long unsigned int num_rows = 0; // rows, or tests, in the array
+        long unsigned int num_cols = 0; // columns, or factors, in the array
+        std::vector<long unsigned int> levels;  // levels associated with each factor
+        std::vector<long unsigned int*> array;  // the array itself
+        int process_input();            // call this to process standard in
 
         // constructor(s) and deconstructor
         Parser();                       // default constructor, probably won't be used

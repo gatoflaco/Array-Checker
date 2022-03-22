@@ -32,10 +32,10 @@ v2.0
 Notes:
 
 Should be (1, 1)-locating.
-Should be (1, 1)-detecting.
+Should be (1, 1, 1)-detecting.
 
 Should be (1, 2)-locating.
-Should not be (1, 2)-detecting.
+Should not be (1, 2, 1)-detecting.
 
 Should be (2, 1)-locating.
-Should not be (2, 1)-detecting.
+Should not be (2, 1, 1)-detecting.

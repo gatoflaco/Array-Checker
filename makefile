@@ -2,19 +2,21 @@ HDR = Headers
 OBJ = Objects
 SRC = Sources
 
-ALL all: check
+ALL all: build
+DEBUG debug: build-debug
 
-check: $(OBJ)/check.o $(OBJ)/parser.o $(OBJ)/array.o $(OBJ)/factor.o
-	g++ -std=c++11 -o check $(OBJ)/check.o $(OBJ)/parser.o $(OBJ)/array.o $(OBJ)/factor.o
+CXXFLAGS := -std=c++11 -lm
+CXXFLAGS += -pedantic -Wall -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy\
+-Wdisabled-optimization -Wformat=2 -Winit-self -Wlogical-op -Wmissing-include-dirs\
+-Wnoexcept -Wold-style-cast -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-conversion\
+-Wsign-promo -Wstrict-null-sentinel -Wstrict-overflow=5 -Wswitch-default -Wundef -Werror -Wno-unused
 
-$(OBJ)/check.o: $(SRC)/check.cpp
-	g++ -I ./$(HDR) -c -o $(OBJ)/check.o $(SRC)/check.cpp
+build: check
+build-debug: CXXFLAGS += -g -g3
+build-debug: build
 
-$(OBJ)/parser.o: $(HDR)/parser.h $(SRC)/parser.cpp
-	g++ -I ./$(HDR) -c -o $(OBJ)/parser.o $(SRC)/parser.cpp
+check: $(HDR)/* $(SRC)/*
+	$(CXX) $(CXXFLAGS) -I $(HDR) -o check $(SRC)/*.cpp
 
-$(OBJ)/array.o: $(HDR)/array.h $(SRC)/array.cpp
-	g++ -I ./$(HDR) -c -o $(OBJ)/array.o $(SRC)/array.cpp
-
-$(OBJ)/factor.o: $(HDR)/factor.h $(SRC)/factor.cpp
-	g++ -I ./$(HDR) -c -o $(OBJ)/factor.o $(SRC)/factor.cpp
+clean:
+	$(RM) check

@@ -1,5 +1,5 @@
 /* LA-Checker by Isaac Jung
-Last updated 03/20/2022
+Last updated 03/21/2022
 
 |===========================================================================================================|
 |   This file contains the main() method which reflects the high level flow of the program. It starts by    |
@@ -58,7 +58,7 @@ static int conclusion(int d, int t, int delta, bool is_covering, bool is_locatin
 int main(int argc, char *argv[])
 {
     Parser p(argc, argv);   // create Parser object that immediately processes arguments and flags
-    int d = p.d, t = p.t, delta = p.delta;  // set values of d, t, and δ based on those processed by the Parser
+    long unsigned int d = p.d, t = p.t, delta = p.delta;    // set values based on those in the Parser
     vm = p.v; om = p.o; pm = p.p;   // update flags based on those processed by the Parser
     if (vm == v_on) verbose_print(d, t, delta); // introductory status print when verbose mode enabled
 	int status = p.process_input();  // read in and process the array
@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
     else    // may need to check location, and whether to show output depends on property mode
         if (pm == all || pm == l_only || pm == c_and_l || pm == l_and_d)
             is_locating = is_covering && array.is_locating(true);  // show output according to output mode
-        else if (pm == d_only || pm == c_and_d);
+        else if (pm == d_only || pm == c_and_d)
             is_locating = is_covering && array.is_locating(false); // don't show output (d flagged but not l)
         // else property mode is c_only and location should not be computed
     
@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
             is_detecting = is_locating && array.is_detecting();
             if (!is_detecting) return conclusion(d, t, delta, is_covering, is_locating, false);
             conclusion(d, t, delta, is_covering, is_locating, true);
-            if (array.true_delta > delta) printf("The greatest separation is actually %d.\n", array.true_delta);
+            if (array.true_delta > delta) printf("The greatest separation is actually %lu.\n", array.true_delta);
             return 0;
         }   // else property mode is c_only, l_only, or c_and_l and detection should not be computed
 
@@ -136,7 +136,7 @@ static void verbose_print(int d, int t, int delta) {
         printf("==%d== Checking: location, detection\n", pid);
         printf("==%d== Using d = %d, t = %d, δ = %d\n", pid, d, t, delta);
     } else {
-        printf("==%d== No properties to check\nQuitting...\n");
+        printf("==%d== No properties to check\nQuitting...\n", pid);
         exit(1);
     }
     printf("\n");

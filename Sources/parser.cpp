@@ -1,5 +1,5 @@
 /* LA-Checker by Isaac Jung
-Last updated 03/13/2022
+Last updated 03/21/2022
 
 |===========================================================================================================|
 |   This file contains definitions for methods used to process input via an Parser class. Should the input  |
@@ -69,7 +69,7 @@ Parser::Parser(int argc, char *argv[]) : Parser()
         }
         else {
             try {
-                int param = std::stoi(arg);
+                long unsigned int param = static_cast<long unsigned int>(std::stoi(arg));
                 if (num_params < 1) t = param;
                 else if (num_params < 2) { d = t; t = param; }
                 else if (num_params < 3) delta = param;
@@ -126,8 +126,8 @@ int Parser::process_input()
     std::getline(std::cin, cur_line);
     try {
         std::istringstream iss(cur_line);
-        int level;
-        for (int i = 0; i < num_cols; i++) {
+        long unsigned int level;
+        for (long unsigned int i = 0; i < num_cols; i++) {
             if (!(iss >> level)) throw 0;   // error when not enough levels given or not int
             levels.push_back(level);
         }
@@ -137,7 +137,7 @@ int Parser::process_input()
     }
 
     // 0's
-    for (int i = 0; i <= num_cols; i++) {
+    for (long unsigned int i = 0; i <= num_cols; i++) {
         std::getline(std::cin, cur_line);
         try {
             trim(cur_line);
@@ -152,15 +152,15 @@ int Parser::process_input()
     }
 
     // array
-    int *row;
-    for (int i = 0; i < num_rows; i++) {
+    long unsigned int *row;
+    for (long unsigned int i = 0; i < num_rows; i++) {
         std::getline(std::cin, cur_line);
         try {
             std::istringstream iss(cur_line);
-            row = new int[num_cols];
-            for (int j = 0; j < num_cols; j++) {
+            row = new long unsigned int[num_cols];
+            for (long unsigned int j = 0; j < num_cols; j++) {
                 if (!(iss >> row[j])) throw 0;
-                if (row[j] < 0 || row[j] >= levels.at(j)) {  // error when array value out of range
+                if (row[j] >= levels.at(j)) {  // error when array value out of range
                     semantic_error(i+num_cols+5, i+1, j+1, levels.at(j), row[j], false);
                     ret = 1;
                 }
@@ -261,5 +261,5 @@ void Parser::other_error(int lineno, std::string line, bool verbose)
 */
 Parser::~Parser()
 {
-    for (int *row : array) delete[] row;
+    for (long unsigned int *row : array) delete[] row;
 }

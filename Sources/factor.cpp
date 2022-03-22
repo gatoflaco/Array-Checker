@@ -1,5 +1,5 @@
 /* LA-Checker by Isaac Jung
-Last updated 03/20/2022
+Last updated 03/21/2022
 
 |===========================================================================================================|
 |   This file contains just the deconstructor for the Factor class. The Interaction class, which is also    |
@@ -15,14 +15,14 @@ Last updated 03/20/2022
 */
 Single::Single()
 {
-    factor = -1;
-    value = -1;
+    factor = 0;
+    value = 0;
 }
 
 /* CONSTRUCTOR - initializes the object
  * - overloaded: this version can set its fields based on parameters
 */
-Single::Single(int f, int v)
+Single::Single(long unsigned int f, long unsigned int v)
 {
     factor = f;
     value = v;
@@ -34,15 +34,15 @@ Single::Single(int f, int v)
 */
 Factor::Factor()
 {
-    id = -1;
-    level = -1;
+    id = 0;
+    level = 0;
     singles = nullptr;
 }
 
 /* CONSTRUCTOR - initializes the object
  * - overloaded: this version can set its fields based on parameters
 */
-Factor::Factor(int i, int l, Single **ptr_array)
+Factor::Factor(long unsigned int i, long unsigned int l, Single **ptr_array)
 {
     id = i;
     level = l;
@@ -53,6 +53,6 @@ Factor::Factor(int i, int l, Single **ptr_array)
 */
 Factor::~Factor()
 {
-    for (int i = 0; i < level; i++) delete singles[i];
+    for (long unsigned int i = 0; i < level; i++) delete singles[i];
     delete[] singles;
 }
