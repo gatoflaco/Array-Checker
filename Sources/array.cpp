@@ -104,11 +104,11 @@ Array::Array(Parser *in)
     v = in->v; o = in->o; p = in->p;
     num_tests = in->num_rows;
     num_factors = in->num_cols;
-    if(d <= 0 && d > num_tests) {
+    if(d <= 0 || d > num_tests) {
         printf("NOTE: bad value for d, continuing with d = 1\n");
         d = 1;
     }
-    if(t <= 0 && t > num_factors) {
+    if(t <= 0 || t > num_factors) {
         printf("NOTE: bad value for t, continuing with t = 2\n");
         t = 2;
     }
@@ -159,17 +159,17 @@ void Array::build_t_way_interactions(long unsigned int start, long unsigned int 
     std::vector<Single*> *singles_so_far)
 {
     // base case: interaction is completed and ready to store
-    if (t == 0) {
+    if (t_cur == 0) {
         Interaction *new_interaction = new Interaction(singles_so_far);
         interactions.push_back(new_interaction);
         return;
     }
 
     // recursive case: need to introduce another loop for higher strength
-    for (long unsigned int col = start; col < num_factors - t + 1; col++) {
+    for (long unsigned int col = start; col < num_factors - t_cur + 1; col++) {
         for (long unsigned int level = 0; level < factors[col]->level; level++) {
             singles_so_far->push_back(factors[col]->singles[level]);    // note these are Single *
-            build_t_way_interactions(col+1, t-1, singles_so_far);
+            build_t_way_interactions(col+1, t_cur-1, singles_so_far);
             singles_so_far->pop_back();
         }
     }
@@ -193,16 +193,16 @@ void Array::build_size_d_sets(long unsigned int start, long unsigned int d_cur,
     std::vector<Interaction*> *interactions_so_far)
 {
     // base case: set is completed and ready to store
-    if (d == 0) {
+    if (d_cur == 0) {
         T *new_set = new T(interactions_so_far);
         sets.push_back(new_set);
         return;
     }
 
     // recursive case: need to introduce another loop for higher magnitude
-    for (long unsigned int i = start; i < interactions.size() - d + 1; i++) {
+    for (long unsigned int i = start; i < interactions.size() - d_cur + 1; i++) {
         interactions_so_far->push_back(interactions[i]);    // note these are Interaction *
-        build_size_d_sets(i+1, d-1, interactions_so_far);
+        build_size_d_sets(i+1, d_cur-1, interactions_so_far);
         interactions_so_far->pop_back();
     }
 }
