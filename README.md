@@ -191,7 +191,7 @@ Below is a non-comprehensive list of fundamental key words and concepts, ordered
 - **Test**: An assignment of values to each **factor** in the system, selected from the valid levels they can take on. When a test is actually carried out, the system will produce some output, for which the experimenters will have some definition for passing. The goal is to identify a selection of value assignements that can cause a test to fail, and then eventually identify what it was. The cause of a failing test is said to be one or more faulty **interactions**.
 
 ## Additional Links
-[Stephen Seidel's v4-la-tools](https://github.com/gatoflaco/v4-la-tools)
+[Stephen Seidel's v4-la-tools](https://github.com/sseidel16/v4-la-tools)
 - Project which inspired this one
 - Capable of generating (1, 2)-locating arrays from scratch, given factors and their levels
 
