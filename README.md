@@ -1,5 +1,3 @@
-# EDIT 03/21/2022: JUST FINISHED REFACTORING, TESTING NEEDED
-
 # Array-Checker
 ### Author: Isaac Jung
 

@@ -117,28 +117,33 @@ Array::Array(Parser *in)
         delta = 1;
     }
 
-    // build all Singles, associated with an array of Factors
-    factors = new Factor*[num_factors];
-    for (long unsigned int i = 0; i < num_factors; i++) {
-        factors[i] = new Factor(i, in->levels.at(i), new Single*[in->levels.at(i)]);
-        for (long unsigned int j = 0; j < factors[i]->level; j++)
-            factors[i]->singles[j] = new Single(i, j);
+    try {
+        // build all Singles, associated with an array of Factors
+        factors = new Factor*[num_factors];
+        for (long unsigned int i = 0; i < num_factors; i++) {
+            factors[i] = new Factor(i, in->levels.at(i), new Single*[in->levels.at(i)]);
+            for (long unsigned int j = 0; j < factors[i]->level; j++)
+                factors[i]->singles[j] = new Single(i, j);
+        }
+        for (long unsigned int row = 0; row < in->num_rows; row++)
+            for (long unsigned int col = 0; col < in->num_cols; col++)
+                factors[col]->singles[in->array.at(row)[col]]->rows.insert(row + 1);
+        if (v == v_on) print_singles(factors, num_factors);
+
+        // build all Interactions
+        std::vector<Single*> temp_singles;
+        build_t_way_interactions(0, t, &temp_singles);
+        if (v == v_on) print_interactions(interactions);
+
+        // build all Ts
+        if (p == c_only) return;    // no need to spend effort building Ts if they won't be used
+        std::vector<Interaction*> temp_interactions;
+        build_size_d_sets(0, d, &temp_interactions);
+        if (v == v_on) print_sets(sets);
+    } catch (const std::bad_alloc& e) {
+        printf("ERROR: not enough memory to work with given array for given arguments\n");
+        exit(1);
     }
-    for (long unsigned int row = 0; row < in->num_rows; row++)
-        for (long unsigned int col = 0; col < in->num_cols; col++)
-            factors[col]->singles[in->array.at(row)[col]]->rows.insert(row + 1);
-    if (v == v_on) print_singles(factors, num_factors);
-
-    // build all Interactions
-    std::vector<Single*> temp_singles;
-    build_t_way_interactions(0, t, &temp_singles);
-    if (v == v_on) print_interactions(interactions);
-
-    // build all Ts
-    if (p == c_only) return;    // no need to spend effort building Ts if they won't be used
-    std::vector<Interaction*> temp_interactions;
-    build_size_d_sets(0, d, &temp_interactions);
-    if (v == v_on) print_sets(sets);
 }
 
 /* HELPER METHOD: build_t_way_interactions - initializes the interactions vector recursively

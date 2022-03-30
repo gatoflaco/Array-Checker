@@ -1,5 +1,5 @@
 /* LA-Checker by Isaac Jung
-Last updated 03/21/2022
+Last updated 03/30/2022
 
 |===========================================================================================================|
 |   This file contains the main() method which reflects the high level flow of the program. It starts by    |
@@ -57,13 +57,13 @@ static int conclusion(int d, int t, int delta, bool is_covering, bool is_locatin
 */
 int main(int argc, char *argv[])
 {
-    Parser p(argc, argv);   // create Parser object that immediately processes arguments and flags
-    long unsigned int d = p.d, t = p.t, delta = p.delta;    // set values based on those in the Parser
-    vm = p.v; om = p.o; pm = p.p;   // update flags based on those processed by the Parser
-    if (vm == v_on) verbose_print(d, t, delta); // introductory status print when verbose mode enabled
-	int status = p.process_input();  // read in and process the array
-    if (status == -1) return 1; // exit immediately if there is a basic syntactic or semantic error
-    if (status == 1) return 1;  // less trivial issue; another option: return conclusion(t, false);
+    Parser p(argc, argv);               // create Parser object, immediately processes arguments and flags
+    vm = p.v; om = p.o; pm = p.p;       // update flags based on those processed by the Parser
+    
+	int status = p.process_input(); // read in and process the array
+    if (vm == v_on) verbose_print(p.d, p.t, p.delta);   // print status when verbose mode enabled
+    if (status == -1) return 1;     // exit immediately if there is a basic syntactic or semantic error
+    if (status == 1) return conclusion(p.d, p.t, p.delta, false, false, false); // non-trivial issue
     
     Array array(&p);    // create Array object that immediately builds appropriate data structures
     bool is_covering = false, is_locating = false, is_detecting = false;
@@ -88,13 +88,15 @@ int main(int argc, char *argv[])
     else    // check detection if property mode is anything involving the d flag
         if (pm == all || pm == d_only || pm == c_and_d || pm == l_and_d) {  // check detection if requested
             is_detecting = is_locating && array.is_detecting();
-            if (!is_detecting) return conclusion(d, t, delta, is_covering, is_locating, false);
-            conclusion(d, t, delta, is_covering, is_locating, true);
-            if (array.true_delta > delta) printf("The greatest separation is actually %lu.\n", array.true_delta);
+            if (!is_detecting)
+                return conclusion(array.d, array.t, array.delta, is_covering, is_locating, false);
+            conclusion(array.d, array.t, array.delta, is_covering, is_locating, true);
+            if (array.true_delta > array.delta)
+                printf("The greatest separation is actually %lu.\n", array.true_delta);
             return 0;
         }   // else property mode is c_only, l_only, or c_and_l and detection should not be computed
 
-    return conclusion(d, t, delta, is_covering, is_locating, is_detecting);
+    return conclusion(array.d, array.t, array.delta, is_covering, is_locating, is_detecting);
 }
 
 /* HELPER METHOD: verbose_print - prints the introductory status when verbose mode is enabled

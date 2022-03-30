@@ -1,5 +1,5 @@
 /* LA-Checker by Isaac Jung
-Last updated 03/21/2022
+Last updated 03/30/2022
 
 |===========================================================================================================|
 |   This header contains classes for managing the array in an automated fashion. The Row class is just a    |
@@ -53,7 +53,10 @@ class T
 class Array
 {
     public:
-        long unsigned int true_delta; // the true maximum separation is updated during a detection check
+        long unsigned int d;            // this is the size of the sets of t-way interactions
+        long unsigned int t;            // this is the strength of interest
+        long unsigned int delta;        // this is the desired separation of the array
+        long unsigned int true_delta;   // the true maximum separation is updated during a detection check
 
         // checks whether the array is covering; this means that every interaction of strength t occurs in
         // the array at least 1 time (TODO: extend this to at least δ times for (t, δ)-coverage)
@@ -72,9 +75,6 @@ class Array
         ~Array();   // deconstructor
 
     private:
-        long unsigned int d;        // this is the size of the sets of t-way interactions
-        long unsigned int t;        // this is the strength of interest
-        long unsigned int delta;    // this is the desired separation of the array
         verb_mode v;    // this makes the program print out the data structures when enabled
         out_mode o;     // this dictates how much output should be printed; see parser.h for typedef
         prop_mode p;    // this is used to avoid building sets if it won't be needed anyway

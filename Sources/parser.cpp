@@ -1,5 +1,5 @@
 /* LA-Checker by Isaac Jung
-Last updated 03/21/2022
+Last updated 03/30/2022
 
 |===========================================================================================================|
 |   This file contains definitions for methods used to process input via an Parser class. Should the input  |
@@ -62,18 +62,28 @@ Parser::Parser(int argc, char *argv[]) : Parser()
                         else if (p == l_only) p = l_and_d;
                         else p = all;
                         break;
-                    default:    // do nothing
+                    default:
+                        try {
+                            long unsigned int param =
+                                static_cast<long unsigned int>(std::stoi(std::string(1, c)));
+                            printf("NOTE: bad flag \'%lu\'; ignored", param);
+                            printf(" (looks like an int, did you mean to specify without a hyphen?)\n");
+                        } catch ( ... ) {
+                            printf("NOTE: bad flag \'%c\'; ignored\n", c);
+                        }
                         break;
                 }
             }
-        }
-        else {
+        } else {    // command line arguments for specifying d, t, and δ
             try {
                 long unsigned int param = static_cast<long unsigned int>(std::stoi(arg));
                 if (num_params < 1) t = param;
                 else if (num_params < 2) { d = t; t = param; }
                 else if (num_params < 3) delta = param;
-                else printf("NOTE: too many int arguments given; ignored <%s> (be sure to specify 3 at most)\n", arg.c_str());
+                else {
+                    printf("NOTE: too many int arguments given; ignored <%s>", arg.c_str());
+                    printf(" (be sure to specify 3 at most)\n");
+                }
                 num_params++;
             } catch ( ... ) {
                 printf("NOTE: couldn't parse command line argument <%s> as int; ignored\n", arg.c_str());
