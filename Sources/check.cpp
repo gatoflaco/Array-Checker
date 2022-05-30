@@ -1,5 +1,5 @@
 /* Array-Checker by Isaac Jung
-Last updated 03/30/2022
+Last updated 05/30/2022
 
 |===========================================================================================================|
 |   This file contains the main() method which reflects the high level flow of the program. It starts by    |
@@ -78,16 +78,16 @@ int main(int argc, char *argv[])
     if (!is_covering && vm == v_off) is_locating = false;
     else    // may need to check location, and whether to show output depends on property mode
         if (pm == all || pm == l_only || pm == c_and_l || pm == l_and_d)
-            is_locating = is_covering && array.is_locating(true);  // show output according to output mode
+            is_locating = array.is_locating(true) && is_covering;   // show output according to output mode
         else if (pm == d_only || pm == c_and_d)
-            is_locating = is_covering && array.is_locating(false); // don't show output (d flagged but not l)
+            is_locating = array.is_locating(false) && is_covering;  // don't output (d flagged but not l)
         // else property mode is c_only and location should not be computed
     
     // may skip detection check if array lacks location and verbose mode is disabled
     if (!is_locating && vm == v_off) is_detecting = false;
     else    // check detection if property mode is anything involving the d flag
         if (pm == all || pm == d_only || pm == c_and_d || pm == l_and_d) {  // check detection if requested
-            is_detecting = is_locating && array.is_detecting();
+            is_detecting = array.is_detecting(true) && is_locating;
             if (!is_detecting)
                 return conclusion(array.d, array.t, array.delta, is_covering, is_locating, false);
             conclusion(array.d, array.t, array.delta, is_covering, is_locating, true);
