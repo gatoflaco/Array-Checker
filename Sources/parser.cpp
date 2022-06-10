@@ -19,6 +19,7 @@ Parser::Parser()
 {
     d = 1; t = 2; delta = 1;
     v = v_off; o = normal; p = all;
+    num_rows = 0; num_cols = 0;
 }
 
 /* CONSTRUCTOR - initializes the object
@@ -104,85 +105,38 @@ Parser::Parser(int argc, char *argv[]) : Parser()
 int Parser::process_input()
 {
     if (o != silent) printf("Reading input....\n\n");
-    int ret = 0;
     std::string cur_line;
+    std::getline(std::cin, cur_line);
+    if (cur_line.empty()) return -1;
 
-    // v2.0
-    std::getline(std::cin, cur_line);
-    try {
-        trim(cur_line);
-        if (cur_line.compare("v2.0") != 0) {    // must strictly match, else error
-            syntax_error(1, "v2.0", cur_line);
-            return -1;
-        }
-    } catch (...) {
-        other_error(1, cur_line);
-        return -1;
-    }
-    
-    // R C
-    std::getline(std::cin, cur_line);
-    try {
+    // fencepost to get number factors
+    {
         std::istringstream iss(cur_line);
-        if (!(iss >> num_rows)) throw 0;    // error when rows not given or not int
-        if (!(iss >> num_cols)) throw 0;    // error when columns not given or not int
-        if (num_rows < 1 || num_cols < 1) throw 0;  // error when values define impossible array
-    } catch (...) {
-        syntax_error(2, "R C", cur_line);
-        return -1;
-    }
-
-    // levels
-    std::getline(std::cin, cur_line);
-    try {
-        std::istringstream iss(cur_line);
-        long unsigned int level;
-        for (long unsigned int i = 0; i < num_cols; i++) {
-            if (!(iss >> level)) throw 0;   // error when not enough levels given or not int
-            levels.push_back(level);
-        }
-    } catch (...) {
-        syntax_error(3, "L_1 L_2 ... L_C", cur_line);
-        return -1;
-    }
-
-    // 0's
-    for (long unsigned int i = 0; i <= num_cols; i++) {
-        std::getline(std::cin, cur_line);
-        try {
-            trim(cur_line);
-            if (cur_line.compare("0") != 0) {   // must strictly match, else error
-                syntax_error(i+4, "0", cur_line);
-                return -1;
-            }
-        } catch (...) {
-            other_error(i+4, cur_line);
-            return -1;
+        int temp;
+        while (true) {
+            if (!(iss >> temp)) break;
+            num_cols++;
         }
     }
+    long unsigned int *max_values = new long unsigned int[num_cols]{0};
 
-    // array
+    // parsing the array
     long unsigned int *row;
-    for (long unsigned int i = 0; i < num_rows; i++) {
-        std::getline(std::cin, cur_line);
-        try {
-            std::istringstream iss(cur_line);
-            row = new long unsigned int[num_cols];
-            for (long unsigned int j = 0; j < num_cols; j++) {
-                if (!(iss >> row[j])) throw 0;
-                if (row[j] >= levels.at(j)) {  // error when array value out of range
-                    semantic_error(i+num_cols+5, i+1, j+1, levels.at(j), row[j], false);
-                    ret = 1;
-                }
-            }
-            array.push_back(row);
-        } catch (...) {
-            other_error(i+num_cols+5, cur_line);
-            return -1;
+    while (!cur_line.empty()) {
+        std::istringstream iss(cur_line);
+        row = new long unsigned int[num_cols];
+        for (long unsigned int j = 0; j < num_cols; j++) {
+            if (!(iss >> row[j])) return -1;
+            if (row[j] > max_values[j]) max_values[j] = row[j];
         }
+        array.push_back(row);
+        num_rows++;
+        std::getline(std::cin, cur_line);
     }
+    for (long unsigned int j = 0; j < num_cols; j++) levels.push_back(max_values[j] + 1);
+    delete[] max_values;
 
-    return ret;
+    return 0;
 }
 
 /* HELPER METHOD: trim - chops off all leading and trailing whitespace characters from a string
@@ -204,7 +158,6 @@ void Parser::trim(std::string &s) {
         return !std::isspace(ch);
     }).base(), s.end());
 }
-// ======================================================================================================= //
 
 /* HELPER METHOD: syntax_error - prints an error message regarding input format
  * 
