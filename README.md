@@ -1,5 +1,6 @@
-# Array-Checker
+# Array-Checker (input-format-simple branch)
 ### Author: Isaac Jung
+Please note that there are no plans to merge this branch with main.
 
 ## Credits
 [Stephen A. Seidel](https://www.linkedin.com/in/stephen-seidel-18607069/)
@@ -48,24 +49,14 @@ This would automatically read lines from `Sample-Input/example.tsv` with no extr
 ### Input
 The format of the input should be as follows:
 ```
-v2.0
-R C
-L_1 L_2 ... L_C
-0
-0
-...
-0
 # # # # # # # #
 # # # # # # # #
 ...
 # # # # # # # #
 ```
-- The first line MUST consist of the string "v2.0".
-- On the second line, give the number of rows in the array, R, followed by the number of columns in the array, C, separated by whitespace.
-- On the third line, give the number of levels that each factor can take on, respectively, each separated by whitespace. The number of values given here should be equal to the value of C given on the first line.
-- Starting at the fourth line, there must be (C + 1) lines consisting of just the number 0. If you are wondering why... I'm not sure myself. This program's primary purpose is to validate output from Stephen's program, and his output does this for some reason.
-- After that, there begins the array. It should hold that the array has as many rows as was specified by R and as many columns as was specified by C. Furthermore, every column should consist of values that are within the corresponding number of levels given on the third line. All values in a given row of the array should be separated by whitespace, and all rows should be on their own lines.
-Violating the format will result in some sort of error, meaning the program will not attempt to analyze anything. The program is capable of some very basic error identification, to assist you in fixing small issues in your input. Typically the file format is a TSV (tab separated values), meaning that any whitespace characters are actually tabs. However, it is fine to use standard whitespace as well, meaning a TSV is not mandatory. Check the `Sample-Input/` directory for examples of the file format in action. Also note that any additional lines after the array will not be looked at, meaning you can use that space to add notes or other useful info without disrupting the program.
+- This version of the checker expects ONLY THE ARRAY. Not even the number of rows, or the number of factors or their levels should be provided. The program will determine those as it parses the array. Unfortunately, the tradeoff is that it does not report syntax or semantic errors in the array. **This version is intended to augment my Array-Generator project, and should be used only to verify its output.**
+- After that, there begins the array. It should hold that the array has as at least one row, and every row should have an equal number of columns. The columns in a given row of the array should be separated by whitespace, and all rows should be on their own lines.
+Violating the format will often cause it to immediately quit without giving a helpful reason why. Or, depending on the violation, it might not detect any issue at all, and continue to anaylze the array, only to crash or come up with an unexpected conclusion. **Again, do not use this branch of the checker except to verify correctness of output from the Array-Generator.** Typically the file format is a TSV (tab separated values), meaning that any whitespace characters are actually tabs. However, it is fine to use standard whitespace as well, meaning a TSV is not mandatory. Check the `Sample-Input/` directory for examples of the file format in action. Also note that any additional lines after the array will not be looked at, meaning you can use that space to add notes or other useful info without disrupting the program.
 ### Output
 By default, when there are no input format errors, the output of this program shows high level checks performed on the array. Specifically, it will look like this:
 ```
@@ -192,6 +183,10 @@ Below is a non-comprehensive list of fundamental key words and concepts, ordered
 [Stephen Seidel's v4-la-tools](https://github.com/sseidel16/v4-la-tools)
 - Project which inspired this one
 - Capable of generating (1, 2)-locating arrays from scratch, given factors and their levels
+
+[My Array-Generator](https://github.com/gatoflaco/Array-Generator)
+- Tool to generate the types of arrays that this project verifies
+- This branch of my Array-Checker is used for verifying its correctness
 
 Colbourn and McClary, *[Locating and Detecting Arrays for Interaction Faults](https://drops.dagstuhl.de/opus/volltexte/2009/2240/pdf/09281.ColbournCharles.Paper.2240.pdf)*
 - Paper cited as first to propose locating and detecting arrays
