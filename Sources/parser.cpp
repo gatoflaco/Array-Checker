@@ -1,5 +1,5 @@
 /* Array-Checker by Isaac Jung
-Last updated 03/30/2022
+Last updated 06/10/2022
 
 |===========================================================================================================|
 |   This file contains definitions for methods used to process input via an Parser class. Should the input  |
