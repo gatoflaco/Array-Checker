@@ -1,12 +1,12 @@
 /* Array-Checker by Isaac Jung
-Last updated 03/21/2022
+Last updated 07/25/2022
 
 |===========================================================================================================|
 |   This header contains classes used for organizing data associated with the arrays used by check.cpp. See |
 | parser.cpp for a look at how these classes are used. The idea behind the organization is also covered in  |
 | the README. The short of it is that it is useful to know in what rows a given interaction can occur, and  |
 | it is also useful to have a class representing an entire column in the array. Each column corresponds to  |
-| factor, and each factor has an associated range of levels it can take on.
+| factor, and each factor has an associated range of levels it can take on.                                 |
 |===========================================================================================================| 
 */
 

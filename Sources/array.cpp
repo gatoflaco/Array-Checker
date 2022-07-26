@@ -1,11 +1,11 @@
 /* Array-Checker by Isaac Jung
-Last updated 03/21/2022
+Last updated 07/25/2022
 
 |===========================================================================================================|
-|   This file containes the meat of this project's logic. The constructor for the Array class has a pointer |
-| to an InputInfo object which should have already called its process_info() method. Using that, the Array  |
+|   This file contains the meat of this project's logic. The constructor for the Array class has a pointer  |
+| to a Parser object which should have already called its process_input() method. Using that, the Array     |
 | object under construction is able to organize the data structures that support the analysis of the given  |
-| locating array. The is_covering(), is_locating(), and is_detecting() methods can then be called at will.  |
+| array. The is_covering(), is_locating(), and is_detecting() methods can then be called at will.           |
 | The is_covering() method simply ensures that all possible t-way interactions are present in the array.    |
 | The is_locating() method checks every pair of size-d sets of t-way interactions, and ensures that the set |
 | of rows in which one set of interactions occurs is not equal to the set of rows in which the other does.  |
