@@ -193,6 +193,10 @@ Below is a non-comprehensive list of fundamental key words and concepts, ordered
 - Project which inspired this one
 - Capable of generating (1, 2)-locating arrays from scratch, given factors and their levels
 
+[My Array-Generator](https://github.com/gatoflaco/Array-Generator)
+- Tool to generate the types of arrays that this project verifies
+- The input-format-simple branch of this project is meant to augment the generator in a convenient manner.
+
 Colbourn and McClary, *[Locating and Detecting Arrays for Interaction Faults](https://drops.dagstuhl.de/opus/volltexte/2009/2240/pdf/09281.ColbournCharles.Paper.2240.pdf)*
 - Paper cited as first to propose locating and detecting arrays
 - Formal definitions for covering, locating, and detecting arrays can be found here
